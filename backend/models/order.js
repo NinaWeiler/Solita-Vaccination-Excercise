@@ -7,7 +7,7 @@ const orderSchema = new mongoose.Schema({
     healthCareDistrict: String,
     vaccine: String,
     injections: Number,
-    arrived: String
+    arrived: String,
   })
 
   orderSchema.set('toJSON', {

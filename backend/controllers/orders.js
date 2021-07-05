@@ -13,7 +13,7 @@ orderRouter.get('/', async (request, response) => {
 orderRouter.get('/:id', async (request, response) => {
     try {
         const order = await Order.find({id: request.params.id})
-        response.json(order)
+        if(order.length > 0) {response.json(order)} else {return error}
     } 
     catch (error) {
         response.status(404).send({ error: 'unknown endpoint' })
@@ -29,15 +29,13 @@ orderRouter.get('/n/:orderNumber', async (request, response) => {
     
 })
 
-// vaccines arrived by given date, can be done in front end
+// vaccines arrived by given date
 orderRouter.get('/arrived/:day', async (request, response) => {
-    // const orders = await Order.find({})
-    // const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
-     //console.log('filtered', filtered)
-     try {
-         const orders = await Order.find({arrived : startsWith(request.params.day)})
-     }
-     catch(error) {console.log(error)}
+    const orders = await Order.find({})
+    const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
+    //console.log('filtered', filtered) 
+    if (filtered.length > 0) {response.json(filtered)
+    } else {response.status(404).send({message: 'No orders arrived on given day'})}
  })
   
 module.exports = orderRouter
