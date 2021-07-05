@@ -3,40 +3,41 @@ const Order = require('../models/order')
 
 // /api/orders
 
-orderRouter.get('/', (request, response) => {
-    Order
-    .find({})
-    .then(orders => {
-      response.json(orders)
-    })
+orderRouter.get('/', async (request, response) => {
+    const orders = await Order.find({})
+    response.json(orders)
+    
 })
 
-orderRouter.get('/:id', (request, response) => {
-    Order.findById(request.params.id).then(order => {
+//bottle id
+orderRouter.get('/:id', async (request, response) => {
+    try {
+        const order = await Order.find({id: request.params.id})
         response.json(order)
-    })
+    } 
+    catch (error) {
+        response.status(404).send({ error: 'unknown endpoint' })
+    }
 })
 
-orderRouter.post('/', (request, response) => {
-    const body = request.body
-  
-    if (body.id === undefined) {
-      return response.status(400).json({ error: 'content missing' })
-    }
-  
-    const order = new Order({
-        id: body.id,
-        orderNumber: body.orderNumber,
-        responsiblePerson: body.responsiblePerson,
-        healthCareDistrict: body.healthCareDistrict,
-        vaccine: body.vaccine,
-        injections: body.injections,
-        arrived: body.arrived
-    })
-  
-    order.save().then(savedOrder => {
-      response.json(savedOrder)
-    })
-  })
+//order number
+orderRouter.get('/n/:orderNumber', async (request, response) => {
+    const orderNumber = request.params.orderNumber
+    const orders = await Order.find({orderNumber: orderNumber})
+    if (orders.length > 0) {response.json(orders)
+    } else response.status(404).send({error: 'Cannot find order with given number'})
+    
+})
+
+// vaccines arrived by given date, can be done in front end
+orderRouter.get('/arrived/:day', async (request, response) => {
+    // const orders = await Order.find({})
+    // const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
+     //console.log('filtered', filtered)
+     try {
+         const orders = await Order.find({arrived : startsWith(request.params.day)})
+     }
+     catch(error) {console.log(error)}
+ })
   
 module.exports = orderRouter
