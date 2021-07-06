@@ -1,22 +1,32 @@
+import React, { useState, useEffect } from 'react'
+import vaccinationService from './services/vaccinations'
+import Navbar from './components/Navbar'
+import Home from './pages/Home'
 
+const App = () => {
+  const [vaccinations, setVaccinations] = useState([])
+  const [showDay, setShowDay] = useState([])
 
-function App() {
+  useEffect(() => {
+    vaccinationService.getAll().then((vaccinations) => setVaccinations(vaccinations))
+  }, [])
+
+  const showSelectedDay = (day) => {
+    const selectedVaccinations = vaccinations.filter(v => v.vaccinationDate.startsWith(day))
+    setShowDay(selectedVaccinations)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+    <Navbar/>
+    <Home/>
+    <h>Vaccinations</h>
+    <button onClick={() => showSelectedDay('2021-03-07')}>Click</button>
+    {showDay.map((vaccination) => (
+      <p>{vaccination.gender}</p>
+    ))
+    }
+    </>
   );
 }
 
