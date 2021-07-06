@@ -5,8 +5,22 @@ const vaccinationSchema = new mongoose.Schema({
     gender: String,
     sourceBottle: String,
     vaccinationDate: String,
+    order: [
+      {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Order'
+    }
+    ]
   })
 
+  
+  vaccinationSchema.virtual('orders', {
+    ref: 'Order',
+    localField: 'sourceBottle',
+    foreignField: 'id',
+    justOne: false,
+  })
+  
   vaccinationSchema.set('toJSON', {
     transform: (document, returnedObject) => {
       //returnedObject.id = returnedObject._id.toString()

@@ -1,5 +1,6 @@
 const orderRouter = require('express').Router()
 const Order = require('../models/order')
+const Vaccination = require('../models/vaccination')
 
 // /api/orders
 
@@ -18,6 +19,17 @@ orderRouter.get('/:id', async (request, response) => {
     catch (error) {
         response.status(404).send({ error: 'unknown endpoint' })
     }
+})
+
+//orders and vaccinations
+orderRouter.get('/combined/:id', async (request, response) => {
+    const order = await Order.find({id: request.params.id})
+    const vaccinations = await Vaccination.find({sourceBottle: request.params.id})
+    console.log('order', order[0])
+    console.log('vaccinations', vaccinations)
+    //returns only first of array, fix this!
+    const data = order[0].vaccinations.push(vaccinations[0])
+    response.json(order)
 })
 
 //order number

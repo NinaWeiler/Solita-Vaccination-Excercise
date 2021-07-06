@@ -8,6 +8,12 @@ const orderSchema = new mongoose.Schema({
     vaccine: String,
     injections: Number,
     arrived: String,
+    vaccinations: [
+      {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Vaccination'
+    }
+    ]
   })
 
   orderSchema.set('toJSON', {
