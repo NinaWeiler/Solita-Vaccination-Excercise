@@ -1,15 +1,17 @@
 import React, {useState, useEffect} from 'react'
-import {format, isAfter, parseISO, isBefore} from 'date-fns'
+import {format, parseISO, isBefore} from 'date-fns'
 
 
+//const initialState = format(new Date(), {representation: 'date'})
+const initialState = '2021-03-07'
 
-const Home = ({vaccinations, selectedDay}) => {
-    const [totalGivenBy, setTotalGivenBy] = useState('')
-    if (selectedDay === null) { selectedDay = format(new Date(), {representation: 'date'})} 
+const Calendar = ({vaccinations}) => {
+    const [given, setGiven] = useState([])
+    const [selectedDay, setSelectedDay] = useState(initialState)
 
     useEffect(() => {
-        const result = vaccinations.filter(a => isBefore(parseISO(a.vaccinationDate), parseISO(selectedDay)))
-        setTotalGivenBy(result)
+        const result = vaccinations.filter(v => v.vaccinationDate.startsWith(selectedDay))
+        setGiven(result)
     }, [selectedDay, vaccinations])
 
 
@@ -19,8 +21,7 @@ const Home = ({vaccinations, selectedDay}) => {
             <div class="column is-8">
                 <div class="box">
                 <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Vaccination status on {selectedDay}</p>
-                <p>Vaccinations given in total: {totalGivenBy.length}</p>
-                <p>Zepfy: </p>
+                <p>Vaccinations given today: {given.length}</p>
                 </div>
             </div>
             <div class="column">
@@ -40,4 +41,4 @@ const Home = ({vaccinations, selectedDay}) => {
     )
 }
 
-export default Home
+export default Calendar
