@@ -64,6 +64,39 @@ orderRouter.get('/arrived/:day', async (request, response) => {
  })
 
 // map the filtered orders and check for id match? 
+
+const vaccinations = async (id) => {
+    const data = await Vaccination.find({sourceBottle: id})
+    try {
+        if(data) {
+            //const result = data.map(d => d.toJSON())
+            //console.log('result',result)
+            //console.log('data', data[0])
+            return data
+        } else {return []}
+    } catch (error) {
+        { response.status(404).send({error: 'error matching injection to source bottle'})}   
+    }
+
+}  
+
+orderRouter.get('/expanded/:day', async (request, response) => {
+    const orders = await Order.find({})
+    const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
+/*
+    const expanded = filtered.map(f => {
+        vaccinations(f.id).then((data) => f.vaccines.push(...data))
+    })
+*/
+    //const expanded = filtered.map(async f => await f.vaccines.push(vaccinations(f.id)))
+    const expanded = await Promise.all(filtered.map(async f => {
+        const data = await vaccinations(f.id)
+        console.log('data', data)
+        return f.vaccines.push(data)
+    }))
+    console.log(filtered[0])
+    response.json(filtered)
+})
 // should I keep different vaccine types separate? maybe. 
   
 module.exports = orderRouter
