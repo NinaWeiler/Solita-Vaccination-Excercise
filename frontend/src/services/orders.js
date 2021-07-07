@@ -11,4 +11,9 @@ const getAllToday = async (day) => {
     return response.data
 }
 
-export default {getAll, getAllToday}
+const getCombinedInfo = async (id) => {
+    const response = await axios.get(baseUrl + '/combined/' + id)
+    return response.data
+}
+
+export default {getAll, getAllToday, getCombinedInfo}

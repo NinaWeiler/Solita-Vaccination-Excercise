@@ -1,16 +1,32 @@
 import React, {useState, useEffect} from 'react'
-import {format, isAfter, parseISO, isBefore} from 'date-fns'
+import { parseISO, isBefore} from 'date-fns'
 
 
 
-const Home = ({vaccinations, selectedDay}) => {
-    const [totalGivenBy, setTotalGivenBy] = useState('')
-    if (selectedDay === null) { selectedDay = format(new Date(), {representation: 'date'})} 
+const Home = ({vaccinations, orders, selectedDay}) => {
+    const [loading, setLoading] = useState(false)
+    const [totalGivenBy, setTotalGivenBy] = useState([])
+    const [totalArrivedBy, setTotalArrivedBy] = useState([])
+    //if (selectedDay === null) { selectedDay = format(new Date(), {representation: 'date'})} 
 
     useEffect(() => {
-        const result = vaccinations.filter(a => isBefore(parseISO(a.vaccinationDate), parseISO(selectedDay)))
-        setTotalGivenBy(result)
-    }, [selectedDay, vaccinations])
+        async function fetchData()  {
+        setLoading(true)
+        const vaccinationsGivenBy = await vaccinations.filter(a => isBefore(parseISO(a.vaccinationDate), parseISO(selectedDay)))
+        setTotalGivenBy(vaccinationsGivenBy)
+        const ordersArrivedBy = await orders.filter(o => isBefore(parseISO(o.arrived), parseISO(selectedDay)))
+        setTotalArrivedBy(ordersArrivedBy)
+        setLoading(false)
+        }
+        fetchData()
+    }, [selectedDay, vaccinations, orders])
+
+    const vaccinationBrand = (brand) => {
+        const data =  totalArrivedBy.filter(v => v.vaccine === brand)
+        return data
+    }
+
+    
 
 
     return (
@@ -18,9 +34,18 @@ const Home = ({vaccinations, selectedDay}) => {
         <div class="columns is-vcentered">
             <div class="column is-8">
                 <div class="box">
-                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Vaccination status on {selectedDay}</p>
+                {totalArrivedBy.length === 0 ? <p>Loading data</p> 
+                : 
+                <>
+                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Vaccination and order status today ({selectedDay})</p>
                 <p>Vaccinations given in total: {totalGivenBy.length}</p>
-                <p>Zepfy: </p>
+                <p>Orders arrived in total: {totalArrivedBy.length}</p>
+                <p>Zerpfy: {vaccinationBrand('Zerpfy').length} bottles ({vaccinationBrand('Zerpfy')[0].injections} injections per bottle)</p>
+                <p>Antiqua: {vaccinationBrand('Antiqua').length} bottles ({vaccinationBrand('Antiqua')[0].injections} injections per bottle)</p>
+                <p>SolarBuddhica: {vaccinationBrand('SolarBuddhica').length} bottles ({vaccinationBrand('SolarBuddhica')[0].injections} injections per bottle)</p>
+                <p>Orders on their way: </p>
+                </>
+                }
                 </div>
             </div>
             <div class="column">
@@ -28,13 +53,6 @@ const Home = ({vaccinations, selectedDay}) => {
                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Check status for any day</p>
                 </div> 
             </div>
-        </div>
-        <div class="columns is-vcentered">
-        <div class="column is-8">
-            <div class="box">
-                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Order status on {selectedDay}</p>
-            </div>
-        </div>
         </div>
         </div>
     )

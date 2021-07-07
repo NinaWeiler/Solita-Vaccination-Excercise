@@ -8,13 +8,16 @@ const orderSchema = new mongoose.Schema({
     vaccine: String,
     injections: Number,
     arrived: String,
-    vaccinations: [
-      {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Vaccination'
-    }
-    ]
-  })
+    vaccines: Array,
+  }, { toJSON: { virtuals: true }})
+
+  
+  //orderSchema.virtual('vaccinations', {
+  //  ref: 'Vaccination',
+  //  localField: 'id',
+  //  foreignField: 'sourceBottle',
+  //  justOne: false,
+  //}) 
 
   orderSchema.set('toJSON', {
     transform: (document, returnedObject) => {
