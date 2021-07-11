@@ -5,7 +5,7 @@ import orderService from '../services/orders'
 
 
 //const initialDay = format(new Date(), 'yyy-MM-dd')
-const initialDay = format(parseISO('2021-02-02'), 'yyyy-MM-dd')
+const initialDay = format(parseISO('2021-03-11'), 'yyyy-MM-dd')
 console.log(new Date())
 
 const initialState = {
@@ -31,11 +31,12 @@ const Calendar = ({vaccinations, orders}) => {
     
     // bottle expires 30 day after arrival
     // get amount of unused injections from bottles that arrived 30 days ago
+    // amount of expired bottles is length of data array!
     const expiredToday = async (day) => {
         //day 30 days before selectedDay
         const arrivalDay = format(subDays(parseISO(day), 30), 'yyyy-MM-dd').toString()
         const data = await orderService.getOrdersAndInjections(arrivalDay)
-        return data.reduce((amount, order) => amount + (order.injections - order.vaccines.length), 0)
+        return data.reduce((amount, order) => amount + (order.injections - order.injected), 0)
     }
 
     const expiredTotal = async () => {
@@ -76,8 +77,8 @@ const Calendar = ({vaccinations, orders}) => {
     */
 
     const fetchData = async() => {
-        const vaccinationsGiven = await givenToday()
-        const ordersArrived = await arrivedToday()
+        const vaccinationsGiven = givenToday()
+        const ordersArrived = arrivedToday()
         const expired = await expiredToday(day)
         //const totalExpired = await expiredTotal()
         const totalExpired = 8
