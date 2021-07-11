@@ -1,21 +1,20 @@
 const orderRouter = require('express').Router()
 const Order = require('../models/order')
 const Vaccination = require('../models/vaccination')
+const {format, parseISO, isBefore} = require('date-fns')
+
 
 // /api/orders
 
 //TODO:
-//get orders and orderd them by arrival date
 
+//get all orders
 
+//.select() determines which fields are returned
+//.lean() makes the request lighter
 orderRouter.get('/', async (request, response) => {
-   // const orders = await Order.find({}).populate({ path: 'vaccinations', select: 'id sourceBottle vaccinationDate'}).exec(function(error, orders) {
-    //    console.log(orders[8].vaccinations)
-        //response.json(orders.map(o => o.toJSON()))
-    //    response.json(orders)
-   // })
     try {
-        const orders = await Order.find({}).select('arrived vaccine injections')
+        const orders = await Order.find({}).select('arrived vaccine injections -_id').lean()
         console.log(orders[1])
         if(orders.length > 0) {response.json(orders)} else {return error}
     } catch (error) {
@@ -23,6 +22,63 @@ orderRouter.get('/', async (request, response) => {
 
     }
 })
+
+const vaccinations = async (id) => {
+    const data = await Vaccination.find({sourceBottle: id}).select('vaccinationDate -_id').lean()
+    try {
+        if(data) {
+            return data.length
+        } else {return 0}
+    } catch (error) {
+        { response.status(404).send({error: 'error matching injection to source bottle'})}   
+    }
+
+}  
+
+// fetches orders by day and returns each order with info about the given injections
+// add error handling!
+
+orderRouter.get('/expanded/:day', async (request, response) => {
+    const orders = await Order.find({}).select('arrived vaccine injections injected id -_id')
+    const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
+    const expanded = await Promise.all(filtered.map(async f => {
+        const data = await vaccinations(f.id)
+        return f.injected = data;
+    }))
+    response.json(filtered)
+})
+
+
+//orders with info by given date not working
+orderRouter.get('/expiredby/:day', async (request, response) => {
+    const orders = await Order.find({}).select('arrived injections injected id -_id')
+    const filtered = orders.filter(o => isBefore(parseISO(o.arrived), parseISO(request.params.day)))
+    const expanded = await Promise.all(filtered.map(async f => {
+        const data = await vaccinations(f.id)
+        return f.injected = data;
+    }))
+    response.json(filtered)
+})
+
+
+// vaccines arrived on given date
+orderRouter.get('/arrived/:day', async (request, response) => {
+    const orders = await Order.find({}).select('arrived vaccine injections -_id').lean()
+    const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
+    if (filtered.length > 0) {response.json(filtered)
+    } else {response.status(404).send({message: 'No orders arrived on given day'})}
+ })
+
+orderRouter.get('/Zerpfy', async (request, response) => {
+    return null
+})
+
+//populate like this maybe
+   // const orders = await Order.find({}).populate({ path: 'vaccinations', select: 'id sourceBottle vaccinationDate'}).exec(function(error, orders) {
+    //    console.log(orders[8].vaccinations)
+        //response.json(orders.map(o => o.toJSON()))
+    //    response.json(orders)
+   // })
 
 orderRouter.get('/sorted', async (request, response) => {
     const orders = await Order.find({})
@@ -68,43 +124,11 @@ orderRouter.get('/n/:orderNumber', async (request, response) => {
     
 })
 
-// vaccines arrived by given date
-orderRouter.get('/arrived/:day', async (request, response) => {
-    const orders = await Order.find({})
-    const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
-    //console.log('filtered', filtered) 
-    if (filtered.length > 0) {response.json(filtered)
-    } else {response.status(404).send({message: 'No orders arrived on given day'})}
- })
+
 
 // map the filtered orders and check for id match? 
 
-const vaccinations = async (id) => {
-    const data = await Vaccination.find({sourceBottle: id})
-    try {
-        if(data) {
-            //const result = data.map(d => d.toJSON())
-            //console.log('result',result)
-            //console.log('data', data[0])
-            return data
-        } else {return []}
-    } catch (error) {
-        { response.status(404).send({error: 'error matching injection to source bottle'})}   
-    }
 
-}  
-
-// fetches orders by day and returns each order with info about the given injections
-//could change to Order.find({arrived: startsWith(day)})
-orderRouter.get('/expanded/:day', async (request, response) => {
-    const orders = await Order.find({})
-    const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
-    const expanded = await Promise.all(filtered.map(async f => {
-        const data = await vaccinations(f.id)
-        return f.vaccines.push(data)
-    }))
-    response.json(filtered)
-})
 // should I keep different vaccine types separate? maybe. 
   
 
