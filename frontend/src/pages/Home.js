@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react'
-import { parseISO, isBefore} from 'date-fns'
+import { parseISO, isBefore, format} from 'date-fns'
 
 
+const selectedDay = format(new Date(), 'yyy-MM-dd')
 
-const Home = ({vaccinations, orders, selectedDay}) => {
+const Home = ({vaccinations, orders}) => {
     const [loading, setLoading] = useState(false)
     const [totalGivenBy, setTotalGivenBy] = useState([])
     const [totalArrivedBy, setTotalArrivedBy] = useState([])

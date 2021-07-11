@@ -3,12 +3,27 @@ const Vaccination = require('../models/vaccination')
 
 // /api/vaccinations
 
+//TODO:
+//get vaccinations and order them by vaccination date
+
 vaccinationRouter.get('/', async (request, response) => {
-    const vaccinations = await Vaccination.find({}).populate({ path: 'orders', select: 'sourceBottle id'}).exec(function(error, vaccinations) {
+    const vaccinations = await Vaccination.find({}).select('sourceBottle vaccinationDate orders').populate({ path: 'orders', select: 'sourceBottle id'}).exec(function(error, vaccinations) {
         response.json(vaccinations.map(v => v.toJSON()))
     })
     
 })
+
+vaccinationRouter.get('/sorted', async (request, response) => {
+    const vaccinations = await Vaccination.find({})
+        
+    response.json(vaccinations.sort((function(a,b) {
+        a = new Date(a.vaccinationDate)
+        b = new Date(b.vaccinationDate)
+        return a - b
+    })))
+})    
+    
+
 
 //vaccination id
 vaccinationRouter.get('/:id', async (request, response) => {

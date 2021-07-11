@@ -3,16 +3,21 @@ import vaccinationService from './services/vaccinations'
 import orderService from './services/orders'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
-import ArrivedToday from './components/ArrivedToday'
+//import ArrivedToday from './components/ArrivedToday'
 import Calendar from './pages/Calendar'
+
+//Last order arrived on 2021-04-12 ?
+//First order arrived on 
+//First vaccination on 2021-01-02
+//Last vaccination on 2021-04-12
 
 const App = () => {
   const [vaccinations, setVaccinations] = useState([])
   const [orders, setOrders] = useState([])
-  const [showDay, setShowDay] = useState([])
+  //const [showDay, setShowDay] = useState([])
   const [loading, setLoading] = useState(false)
-  const [combined, setCombined] = useState([])
-  const [load, setLoad] = useState(false)
+  //const [combined, setCombined] = useState([])
+  //const [load, setLoad] = useState(false)
 
   
   useEffect(() => {
@@ -42,12 +47,13 @@ const App = () => {
     }
     fetchData()
   }, []) 
-  */
+  
 
   const showSelectedDay = (day) => {
     const selectedVaccinations = vaccinations.filter(v => v.vaccinationDate.startsWith(day))
     setShowDay(selectedVaccinations)
   }
+  */
   //console.log('order obect', orders[8])
   //console.log('order vaccies', orders[8].vaccinations)
 
@@ -55,8 +61,8 @@ const App = () => {
     <>
     <Navbar/>
     {loading ? <p>Loading data..</p> : null}
-    {load ? <p>Fetching combined data</p> : null}
-    <Home vaccinations={vaccinations} orders={orders} selectedDay={'2021-04-07'}/>
+    {/*{load ? <p>Fetching combined data</p> : null} */}
+    <Home vaccinations={vaccinations} orders={orders}/> 
     <Calendar vaccinations={vaccinations} orders={orders}/>
     {/*<button onClick={() => showSelectedDay('2021-03-07')}>Click</button>
     {showDay.map((vaccination) => (

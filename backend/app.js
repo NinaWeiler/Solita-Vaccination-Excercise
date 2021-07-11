@@ -1,5 +1,6 @@
 const config = require('./utils/config')
 const express = require('express')
+const compression = require('compression')
 const app = express()
 const cors = require('cors')
 const orderRouter = require('./controllers/orders')
@@ -23,6 +24,7 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(middleware.requestLogger)
 
+app.use(compression())
 app.use('/api/orders', orderRouter)
 app.use('/api/vaccinations', vaccinationRouter)
 

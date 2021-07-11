@@ -1,6 +1,7 @@
 import axios from 'axios'
 const baseUrl = '/api/orders'
 
+
 const getAll = async () => {
     const response = await axios.get(baseUrl)
     return response.data
@@ -16,4 +17,9 @@ const getCombinedInfo = async (id) => {
     return response.data
 }
 
-export default {getAll, getAllToday, getCombinedInfo}
+const getOrdersAndInjections = async (day) => {
+    const response = await axios.get(baseUrl + '/expanded/' + day)
+    return response.data
+}
+
+export default {getAll, getAllToday, getCombinedInfo, getOrdersAndInjections}

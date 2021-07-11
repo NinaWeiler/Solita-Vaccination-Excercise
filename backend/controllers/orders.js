@@ -4,6 +4,10 @@ const Vaccination = require('../models/vaccination')
 
 // /api/orders
 
+//TODO:
+//get orders and orderd them by arrival date
+
+
 orderRouter.get('/', async (request, response) => {
    // const orders = await Order.find({}).populate({ path: 'vaccinations', select: 'id sourceBottle vaccinationDate'}).exec(function(error, orders) {
     //    console.log(orders[8].vaccinations)
@@ -11,7 +15,7 @@ orderRouter.get('/', async (request, response) => {
     //    response.json(orders)
    // })
     try {
-        const orders = await Order.find({})
+        const orders = await Order.find({}).select('arrived vaccine injections')
         console.log(orders[1])
         if(orders.length > 0) {response.json(orders)} else {return error}
     } catch (error) {
@@ -19,6 +23,16 @@ orderRouter.get('/', async (request, response) => {
 
     }
 })
+
+orderRouter.get('/sorted', async (request, response) => {
+    const orders = await Order.find({})
+        
+    response.json(orders.sort((function(a,b) {
+        a = new Date(a.arrived)
+        b = new Date(b.arrived)
+        return a - b
+    })))
+}) 
 
 //bottle id
 orderRouter.get('/:id', async (request, response) => {
@@ -80,23 +94,19 @@ const vaccinations = async (id) => {
 
 }  
 
+// fetches orders by day and returns each order with info about the given injections
+//could change to Order.find({arrived: startsWith(day)})
 orderRouter.get('/expanded/:day', async (request, response) => {
     const orders = await Order.find({})
     const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
-/*
-    const expanded = filtered.map(f => {
-        vaccinations(f.id).then((data) => f.vaccines.push(...data))
-    })
-*/
-    //const expanded = filtered.map(async f => await f.vaccines.push(vaccinations(f.id)))
     const expanded = await Promise.all(filtered.map(async f => {
         const data = await vaccinations(f.id)
-        console.log('data', data)
         return f.vaccines.push(data)
     }))
-    console.log(filtered[0])
     response.json(filtered)
 })
 // should I keep different vaccine types separate? maybe. 
   
+
+
 module.exports = orderRouter
