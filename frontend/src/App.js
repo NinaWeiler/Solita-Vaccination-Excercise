@@ -60,8 +60,8 @@ const App = () => {
   return (
     <>
     <Navbar/>
-    {loading ? <p>Loading data..</p> : null}
-    {/*{load ? <p>Fetching combined data</p> : null} */}
+    {/*{loading ? <p>Loading data..</p> : null}
+    {load ? <p>Fetching combined data</p> : null} */}
     <Home vaccinations={vaccinations} orders={orders}/> 
     <Calendar vaccinations={vaccinations} orders={orders}/>
     {/*<button onClick={() => showSelectedDay('2021-03-07')}>Click</button>

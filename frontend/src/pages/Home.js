@@ -1,9 +1,17 @@
 import React, {useState, useEffect} from 'react'
-import { parseISO, isBefore, format, isAfter    } from 'date-fns'
+import { parseISO, isBefore, format, isAfter, formatISO    } from 'date-fns'
+import DatePicker from 'react-datepicker'
+import "react-datepicker/dist/react-datepicker.css";
+//import 'react-datepicker/dist/react-datepicker-cssmodules.css';
+
+//import CalendarComponent from '../components/CalendarStyle'
+import CalendarContainer from 'react-datepicker'
+import '../components/CalendarStyle.css'
+
 
 
 //const selectedDay = format(new Date(), 'yyy-MM-dd')
-const selectedDay = '2021-02-14'
+const initialDay = '2021-02-14'
 
 const initialState = {
     totalGivenBy: [],
@@ -13,11 +21,22 @@ const initialState = {
     arrivedToday: []
 }
 
+
+
 const Home = ({vaccinations, orders}) => {
     const [loading, setLoading] = useState(false)
     const [state, setState] = useState(initialState)
+    const [startDate, setStartDate] = useState(new Date('2021-01-03'))
+    const [selectedDay, setSelectedDay] = useState(initialDay)
 
+    useEffect(() => {
+        console.log('startDate', startDate)
+        setSelectedDay(format(parseISO(startDate.toISOString()), 'yyyy-MM-dd'))
+        console.log('selectedday', selectedDay)
+    }, [startDate])
+ 
 
+    //total given and given on selected day don't match!
     const totalGiven = () => vaccinations.filter(a => isBefore(parseISO(a.vaccinationDate), parseISO(selectedDay)))
     const totalArrived = () => orders.filter(o => isBefore(parseISO(o.arrived), parseISO(selectedDay)))
     const ordersToCome = () => orders.filter(o => isAfter(parseISO(o.arrived), parseISO(selectedDay)))
@@ -51,8 +70,6 @@ const Home = ({vaccinations, orders}) => {
         return data
     }
 
-    
-
 
     return (
         <div class="container">
@@ -62,7 +79,7 @@ const Home = ({vaccinations, orders}) => {
                 {state.totalArrivedBy.length === 0 ? <p>Loading data</p> 
                 : 
                 <>
-                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Vaccination and order status ({selectedDay})</p>
+                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Vaccination and order total status by {selectedDay}</p>
                 <p>Vaccinations given in total: {state.totalGivenBy.length}</p>
                 <p>Orders arrived in total: {state.totalArrivedBy.length}</p>
                 <p>Zerpfy: {vaccinationBrand('Zerpfy').length} bottles ({vaccinationBrand('Zerpfy')[0].injections} injections per bottle)</p>
@@ -79,6 +96,13 @@ const Home = ({vaccinations, orders}) => {
             <div class="column">
                <div class="box">
                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Check status for any day</p>
+                <DatePicker 
+                selected={startDate} 
+                onChange={(date) => setStartDate(date)} 
+                inline
+                minDate={new Date('2021-01-01')}
+                maxDate={new Date('2021-04-13')}
+                />
                 </div> 
             </div>
         </div>
