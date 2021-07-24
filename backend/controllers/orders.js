@@ -16,13 +16,16 @@ orderRouter.get('/', async (request, response) => {
     try {
         const orders = await Order.find({}).select('arrived vaccine injections -_id').lean()
         console.log(orders[1])
-        if(orders.length > 0) {response.json(orders)} else {return error}
+        return response.json(orders)
+        //if(orders.length > 0) {response.json(orders)} else {return error}
     } catch (error) {
         response.status(404).send({ error: 'unknown endpoint' })
 
     }
 })
 
+
+// return amount of injections given
 const vaccinations = async (id) => {
     const data = await Vaccination.find({sourceBottle: id}).select('vaccinationDate -_id').lean()
     try {
@@ -110,7 +113,7 @@ orderRouter.get('/combined/:id', async (request, response) => {
     console.log('vaccinations', vaccines)
     //adds all objects in the array
     const data = order[0].vaccines.push(...vaccines)
-    if(data) { response.json(order) } else {return error}
+    if(data) { response.json(order) }
     } 
     catch (error) { response.status(404).send({error: 'not found'})}
 })

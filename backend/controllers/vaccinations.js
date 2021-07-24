@@ -10,7 +10,8 @@ const {format, parseISO, isBefore} = require('date-fns')
 vaccinationRouter.get('/', async (request, response) => {
     try {
     const vaccinations = await Vaccination.find({}).select('vaccinationDate').lean()
-    if (vaccinations.length > 0) {return response.json(vaccinations)} else {return error}
+    return response.json(vaccinations)
+    // if (vaccinations.length > 0) {return response.json(vaccinations)} else {return []}
     } catch (error) {
         response.status(404)
     }
