@@ -11,6 +11,8 @@ import Calendar from './pages/Calendar'
 //First vaccination on 2021-01-02
 //Last vaccination on 2021-04-12
 
+//why was one vaccination given before any orders arrived?
+
 const App = () => {
   const [vaccinations, setVaccinations] = useState([])
   const [orders, setOrders] = useState([])
@@ -63,8 +65,8 @@ const App = () => {
     {/*{loading ? <p>Loading data..</p> : null}
     {load ? <p>Fetching combined data</p> : null} */}
     <Home vaccinations={vaccinations} orders={orders}/> 
-    <Calendar vaccinations={vaccinations} orders={orders}/>
-    {/*<button onClick={() => showSelectedDay('2021-03-07')}>Click</button>
+    {/*<Calendar vaccinations={vaccinations} orders={orders}/>
+    <button onClick={() => showSelectedDay('2021-03-07')}>Click</button>
     {showDay.map((vaccination) => (
       <p>{vaccination.gender}</p>
     ))
