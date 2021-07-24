@@ -1,8 +1,9 @@
-import { createStore, applyMiddleware} from 'redux'
-import thunk from 'redux-thunk'
-import rootReducer from './reducers/root'
+import {configureStore} from '@reduxjs/toolkit'
+import dayReducer from './state/daySlice'
 
 
-const store = createStore(rootReducer, applyMiddleware(thunk))
-
-export default store
+export default configureStore({
+    reducer: {
+        day: dayReducer,
+    }
+})
