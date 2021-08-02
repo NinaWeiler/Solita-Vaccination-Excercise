@@ -35,19 +35,10 @@ const App = () => {
   }, []) 
 
   
-  const newDay = '2021-03-13T11:08:11.643530Z'
-  console.log('day', day)
-
   return (
     <>
     <Navbar/>
-    <h>Day is: {day}</h>
-    <button onClick={() => dispatch(selectedDayThis(newDay))}>Change</button>
-    <button onClick={() => dispatch(selectedDayThis('2021-05-03'))}>Change again</button>
-    {/*<Time/>
-    {loading ? <p>Loading data..</p> : null}
-    {load ? <p>Fetching combined data</p> : null}  */}
-    <Home vaccinations={vaccinations} orders={orders}/> 
+    <Home vaccinations={vaccinations} orders={orders} loading={loading}/> 
     </>
   );
 }
