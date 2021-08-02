@@ -4,16 +4,15 @@ import orderService from './services/orders'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import {useSelector, useDispatch} from 'react-redux'
-import {selectDay, selectedDay} from './state/daySlice'
+import {selectDay, selectedDayThis} from './state/daySlice'
 
 //import Calendar from './pages/Calendar'
 
-//Last order arrived on 2021-04-12 ?
+//Last order arrived on 2021-04-12 
 //First order arrived on 2021-01-02
 //First vaccination on 2021-01-02
 //Last vaccination on 2021-04-12
 
-//why was one vaccination given before any orders arrived?
 
 const App = () => {
   const day = useSelector(selectDay)
@@ -36,17 +35,18 @@ const App = () => {
   }, []) 
 
   
-  
+  const newDay = '2021-03-13T11:08:11.643530Z'
+  console.log('day', day)
 
   return (
     <>
     <Navbar/>
     <h>Day is: {day}</h>
-    <button onClick={() => dispatch(selectedDay('tomorrow'))}>Change</button>
-    <button onClick={() => dispatch(selectedDay('yesterday'))}>Change again</button>
-
-    {/*{loading ? <p>Loading data..</p> : null}
-    {load ? <p>Fetching combined data</p> : null} */}
+    <button onClick={() => dispatch(selectedDayThis(newDay))}>Change</button>
+    <button onClick={() => dispatch(selectedDayThis('2021-05-03'))}>Change again</button>
+    {/*<Time/>
+    {loading ? <p>Loading data..</p> : null}
+    {load ? <p>Fetching combined data</p> : null}  */}
     <Home vaccinations={vaccinations} orders={orders}/> 
     </>
   );

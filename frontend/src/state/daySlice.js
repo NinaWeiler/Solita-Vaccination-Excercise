@@ -1,18 +1,22 @@
 import {createSlice} from '@reduxjs/toolkit'
+import { parseISO, format} from 'date-fns'
+
+
 
 export const daySlice = createSlice({
     name: 'day',
     initialState: {
-        selectedDay: new Date('2021-01-03').toString()
+        selectedDay: format(parseISO('2021-01-03'), "yyyy-MM-dd")
+
     },
     reducers: {
-        selectedDay: (state, action) => {
-            state.selectedDay = action.payload
+        selectedDayThis: (state, action) => {
+            state.selectedDay = format(new Date(action.payload), "yyyy-MM-dd")
         }
     }
 })
 
-export const { selectedDay } = daySlice.actions
+export const { selectedDayThis } = daySlice.actions
 
 export const selectDay = state => state.day.selectedDay
 
