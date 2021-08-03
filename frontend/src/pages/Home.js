@@ -1,17 +1,12 @@
 import React, {useState, useEffect} from 'react'
-import { parseISO, isBefore, format, isAfter, formatISO, addDays, subDays} from 'date-fns'
+import { parseISO, isBefore, isAfter, addDays, isSameDay} from 'date-fns'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
-//import 'react-datepicker/dist/react-datepicker-cssmodules.css';
-
-//import CalendarComponent from '../components/CalendarStyle'
-import CalendarContainer from 'react-datepicker'
 import '../components/CalendarStyle.css'
 
+import {useSelector, useDispatch} from 'react-redux'
+import {selectDay, selectedDayThis} from '../state/daySlice'
 
-
-//const selectedDay = format(new Date(), 'yyy-MM-dd')
-const initialDay = '2021-02-14'
 
 const initialState = {
     totalGivenBy: [],
@@ -22,32 +17,23 @@ const initialState = {
 }
 
 
-
-const Home = ({vaccinations, orders}) => {
-    const [loading, setLoading] = useState(false)
+const Home = ({vaccinations, orders, loading}) => {
+    const day = useSelector(selectDay)
+    const dispatch = useDispatch()
     const [state, setState] = useState(initialState)
-    const [startDate, setStartDate] = useState(new Date('2021-01-03'))
-    const [selectedDay, setSelectedDay] = useState(initialDay)
-
-    useEffect(() => {
-        console.log('startDate', startDate)
-        console.log('startdateiSO', startDate.toISOString)
-        setSelectedDay(format(parseISO(startDate.toISOString()), "yyyy-MM-dd"))
-        console.log('selectedday', selectedDay)
-    }, [startDate])
- 
-
-    //total given and given on selected day don't match!
-    //total amount of orders not correct
-    const totalGiven = () => vaccinations.filter(a => isBefore(parseISO(a.vaccinationDate), (addDays(parseISO(selectedDay), 1))))
-    const totalArrived = () => orders.filter(o => isBefore(parseISO(o.arrived), (addDays(parseISO(selectedDay), 1))))
-    const ordersToCome = () => orders.filter(o => isAfter(parseISO(o.arrived), (parseISO(selectedDay))))
-    const givenToday = () => vaccinations.filter(v => v.vaccinationDate.startsWith(selectedDay))
-    const arrivedToday = () => orders.filter(o => o.arrived.startsWith(selectedDay))
+   
+    const totalGiven = () => vaccinations.filter(a => isBefore(parseISO((a.vaccinationDate).slice(0, -8)), (addDays(parseISO(day), 1))))
+    const totalArrived = () => orders.filter(o => isBefore(parseISO((o.arrived).slice(0, -8)), (addDays(parseISO(day), 1))))
+    const ordersToCome = () => orders.filter(o => isAfter((parseISO((o.arrived).slice(0,-8))), (addDays((parseISO(day)), 1))))
+    const givenToday = () => vaccinations.filter(v => isSameDay(parseISO((v.vaccinationDate).slice(0, -8)), parseISO(day)))
+    const arrivedToday = () => orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), parseISO(day)))
+    const vaccinationBrand = (brand) => {
+        const data =  state.totalArrivedBy.filter(v => v.vaccine === brand)
+        return data
+    }
     
     useEffect(() => {
         async function fetchData()  {
-        setLoading(true)
         const given = totalGiven()
         const arrived = totalArrived()
         const vaccinationsGiven = givenToday()
@@ -62,39 +48,69 @@ const Home = ({vaccinations, orders}) => {
             ordersToCome: ordersLeft,
         }))
         console.log('fetching done')
-        setLoading(false)
         }
         fetchData()
-    }, [selectedDay, vaccinations, orders])
+    }, [day, vaccinations, orders])
 
-    const vaccinationBrand = (brand) => {
-        const data =  state.totalArrivedBy.filter(v => v.vaccine === brand)
-        return data
-    }
 
-    console.log('ordersTocome', state.ordersToCome)
-    console.log('arrivedToday', state.arrivedToday)
+
+   console.log(loading)
     return (
         <div class="container">
         <div class="columns is-vcentered">
             <div class="column is-8">
-                <div class="box">
-                {loading ? <p>Loading data</p> 
+                <div class="box" style={{minHeight: '300px'}}>
+                {loading ? <button class="button is-loading is-centered"></button> 
                 : 
                 <>
-                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Vaccination and order total status by {selectedDay}</p>
-                <p>Vaccinations given in total: {state.totalGivenBy.length}</p>
                 {state.totalArrivedBy.length > 0 ? 
                 <>
-                <p>Orders arrived in total: {state.totalArrivedBy.length}</p>
-                <p>Zerpfy: {vaccinationBrand('Zerpfy').length} bottles ({vaccinationBrand('Zerpfy')[0].injections} injections per bottle)</p>
-                <p>Antiqua: {vaccinationBrand('Antiqua').length} bottles ({vaccinationBrand('Antiqua')[0].injections} injections per bottle)</p>
-                <p>SolarBuddhica: {vaccinationBrand('SolarBuddhica').length} bottles ({vaccinationBrand('SolarBuddhica')[0].injections} injections per bottle)</p>
-               
-                <p>Total amount of orders on their way: {state.ordersToCome.length}</p>
+                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Vaccination and Order status on {day}</p>
+                <p class="has-text-danger-dark is-size-5 ">Vaccinations:</p>
+                <p>Vaccinations given in total: {state.totalGivenBy.length}</p>
+                <br/>
+                <p class="has-text-danger-dark is-size-5 ">Orders:</p>
+                <div class='content'>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Brand</th>
+                            <th>Injections per bottle</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Zerpfy</td>
+                            <td>{vaccinationBrand('Zerpfy')[0].injections}</td>
+                            <td>{vaccinationBrand('Zerpfy').length}</td>
+                        </tr>
+                        <tr>
+                            <td>Antiqua</td>
+                            <td>{vaccinationBrand('Antiqua')[0].injections}</td>
+                            <td>{vaccinationBrand('Antiqua').length}</td>
+                        </tr>
+                        <tr>
+                            <td>SolarBuddhica</td>
+                            <td>{vaccinationBrand('SolarBuddhica')[0].injections}</td>
+                            <td>{vaccinationBrand('SolarBuddhica').length}</td>
+                        </tr>
+                </tbody>
+                <tfoot>
+                    <tr style={{fontWeight: 'bold'}}>
+                        <td>Total</td>
+                        <td></td>
+                        <td >{state.totalArrivedBy.length}</td>
+                    </tr>
+                </tfoot>
+                </table>
+                </div>
+                <p>Orders on their way: {state.ordersToCome.length}</p>
                 <p class="has-text-danger-dark is-size-5 has-text-weight-medium">Selected day's numbers:</p>
                 <p>Vaccinations given on selected day: {state.givenToday.length}</p>
                 <p>Orders arrived on selected day: {state.arrivedToday.length}</p>
+                <p class="has-text-danger-dark is-size-5 has-text-weight-medium">Details</p>
+
                 </>
                 : null }
                 </>
@@ -105,8 +121,8 @@ const Home = ({vaccinations, orders}) => {
                <div class="box">
                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Check status for any day</p>
                 <DatePicker 
-                selected={startDate} 
-                onChange={(date) => setStartDate(date)} 
+                selected={parseISO(day)} 
+                onChange={(d) => dispatch(selectedDayThis(d.toString()))} 
                 inline
                 minDate={new Date('2021-01-02')}
                 maxDate={new Date('2021-04-13')}
