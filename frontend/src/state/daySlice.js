@@ -6,7 +6,7 @@ import { parseISO, format} from 'date-fns'
 export const daySlice = createSlice({
     name: 'day',
     initialState: {
-        selectedDay: format(parseISO('2021-01-03'), "yyyy-MM-dd")
+        selectedDay: format(parseISO('2021-01-02'), "yyyy-MM-dd")
 
     },
     reducers: {

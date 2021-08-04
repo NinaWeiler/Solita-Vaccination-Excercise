@@ -22,14 +22,12 @@ const initialState = {
 
 const initialBrandDetails = {
     zerpfyArrived: {totalOrders: 0, totalInjections: 0, todaysOrders: 0, todaysInjections: 0},
-    zerpfyGiven: [],
-    zerpfyExpired: [],
+    zerpfyExpired: 0,
     antiquaArrived:{totalOrders: 0, totalInjections: 0, todaysOrders: 0, todaysInjections: 0},
-    antiquaGiven: [],
-    antiquaExpired: [], 
+    antiquaExpired: 0, 
     solarBuddhicaArrived: {totalOrders: 0, totalInjections: 0, todaysOrders: 0, todaysInjections: 0},
-    solarBuddhicaGiven: [],
-    solarBuddhicaExpired: []
+    solarBuddhicaExpired: 0,
+    totalExpiredToday: 0
 }
 
 
@@ -51,20 +49,17 @@ const Home = ({vaccinations, orders, loading}) => {
     const bottlesExpired = () => orders.filter(o => isBefore(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(day), 29)))
     const bottlesExpiredOnToday = () => orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(day), 30)))
    
-   // move inside count brand details
-    const orderBrand = (brand) => state.totalArrivedBy.filter(v => v.vaccine === brand)
-    const orderBrandToday = (brand) => state.arrivedToday.filter(v => v.vaccine === brand)
-    const totalInjections = (brand) =>  orderBrand(brand).map(a => a.injections).reduce(sumReducer, 0)
-    const todaysInjections = (brand) => orderBrandToday(brand).map(a => a.injections).reduce(sumReducer, 0)
-    // total arrived  O
-    // arrived today  X
-
     const InjectionsArrived = brandDetails.zerpfyArrived.totalInjections + brandDetails.antiquaArrived.totalInjections + brandDetails.solarBuddhicaArrived.totalInjections
     const InjectionsArrivedToday = brandDetails.zerpfyArrived.todaysInjections + brandDetails.antiquaArrived.todaysInjections + brandDetails.solarBuddhicaArrived.totalInjections
 
 
     const countBrandDetails = () => {
-        
+        const orderBrand = (brand) => state.totalArrivedBy.filter(v => v.vaccine === brand)
+        const orderBrandToday = (brand) => state.arrivedToday.filter(v => v.vaccine === brand)
+        const totalInjections = (brand) =>  orderBrand(brand).map(a => a.injections).reduce(sumReducer, 0)
+        const todaysInjections = (brand) => orderBrandToday(brand).map(a => a.injections).reduce(sumReducer, 0)
+        expiredToday()
+        console.log('branddetails', orderBrandToday('Zerpfy'))
 
         setBrandDetails(prevState => ({
             ...prevState,
@@ -75,76 +70,52 @@ const Home = ({vaccinations, orders, loading}) => {
         }))
     }
 
+    const expiredToday = async () => {
+        const data = await orderService.expiredToday(day)
+        const filterBrand = (brand) => data.filter(d => d.vaccine === brand)
+        console.log('counting expiredToday')
+        setBrandDetails(prevState => ({
+            ...prevState,
+            totalExpiredToday: data.map(d => d.expired).reduce(sumReducer, 0),
+            zerpfyExpired: filterBrand('Zerpfy').map(v => v.expired).reduce(sumReducer, 0),
+            antiquaExpired: filterBrand('Antiqua').map(v => v.expired).reduce(sumReducer, 0),
+            solarBuddhicaExpired: filterBrand('SolarBuddhica').map(v => v.expired).reduce(sumReducer, 0)
+        }))
+    }
     
     const expiresSoon = async () => {
-        try {
-            const data = await orderService.expiresIn10Days(day)
-            const amount = data.map(d => d.injections - d.vaccines)
-            return amount.reduce(sumReducer, 0)    //? a,b => a+b, 0
-        } catch (error) {
-            return 0
-        }
+        const data = await orderService.expiresIn10Days(day)
+        console.log('counting expires soon')
+        setState(prevState =>    ({
+            ...prevState, 
+            expiresin10Days: data.map(d => d.injections - d.vaccines).reduce(sumReducer, 0)
+        }))
     } 
-    
-    //given and expired from backend call
-    //expired soon to a different useEffect because it's slower
     
     
     useEffect(() => {
         async function fetchData()  {
-            const given = totalGiven()
-            const arrived = totalArrived()
-            const vaccinationsGiven = givenToday()
-            const ordersArrived = arrivedToday()
-            const ordersLeft = ordersToCome()
-            const expiredBottles = bottlesExpired()
-            const bottlesExpiredToday = bottlesExpiredOnToday()
-            //const expiresIn10Days = await expiresSoon()
-            countBrandDetails()
-            setState( prevState => ({
+            await setState( prevState => ({
                 ...prevState,
                 totalGivenBy: totalGiven(),
-                totalArrivedBy: arrived,
-                givenToday: vaccinationsGiven,
-                arrivedToday: ordersArrived,
-                ordersToCome: ordersLeft,
-                expiredBottles: expiredBottles,
-                bottlesExpiredToday: bottlesExpiredToday,
-                //expiresin10Days: expiresIn10Days
+                totalArrivedBy: totalArrived(),
+                givenToday: givenToday(),
+                arrivedToday: arrivedToday(),
+                ordersToCome: ordersToCome(),
+                expiredBottles: bottlesExpired(),
+                bottlesExpiredToday: bottlesExpiredOnToday(),
             }))
+            countBrandDetails()
+
+            await expiresSoon()
             console.log('fetching done')
         }
         fetchData()
+
     }, [day, vaccinations, orders])
 
-    /*
-    const combinedInfo = async () => {
-        const data = await Promise.all(state.arrivedToday.map(async a => {
-            const result = await orderService.getCombinedInfo(a.id)
-            return result
-        }
-        ))
-        console.log('data', data)
-    }
-
-    /*
-    let fullInfo
-    const getFullInfo = async () => {
-        const data = await Promise.all(state.orders.map(async a => {
-            const result = await orderService.getFullInfo(a.id)
-            return result
-        }))
-        fullInfo = data.length
-        console.log('info', data.length)
-    } 
-    console.log('combined', combinedInfo()) */
-
     
-        const d = subDays(parseISO(day), 30)
-        console.log('d', d)
-    //total vaccinations = order * injections
 
-   console.log(loading)
     return (
         <div class="container">
         <div class="columns">
@@ -173,8 +144,8 @@ const Home = ({vaccinations, orders, loading}) => {
                         </tr>
                         <tr>
                             <td>Injections in bottles</td>
-                            <td>{InjectionsArrived}</td>
                             <td>{InjectionsArrivedToday}</td>
+                            <td style={{fontWeight: 'bold'}}>{InjectionsArrived}</td>
                         </tr>
                         <tr>
                             <td>Vaccinations given</td>
@@ -192,7 +163,7 @@ const Home = ({vaccinations, orders, loading}) => {
                             <td>Injections expiring in 10 days</td>
                             
                             <td></td>
-                            {/*<td style={{fontWeight: 'bold'}}>{state.expiresin10Days}</td>*/}
+                            <td style={{fontWeight: 'bold'}}>{state.expiresin10Days}</td>
                         </tr>
                 </tbody>
                 </table>
@@ -227,38 +198,19 @@ const Home = ({vaccinations, orders, loading}) => {
                             <td>{brandDetails.solarBuddhicaArrived.todaysOrders}</td>
                         </tr>
                         <tr>
-                            <td>Injections today</td>
+                            <td>Injections arrived today</td>
                             <td>{brandDetails.zerpfyArrived.todaysInjections}</td>
                             <td>{brandDetails.antiquaArrived.todaysInjections}</td>
                             <td>{brandDetails.solarBuddhicaArrived.todaysInjections}</td>
                         </tr>
                         <tr>
-                            <td>Given</td>
-                            <td></td>
-                            <td>n/a</td>
-                            <td>n/a</td>
-                        </tr>
-                        <tr>
-                            <td>Expired</td>
-                            <td></td>
-                            <td>n/a</td>
-                            <td>n/a</td>
-                        </tr>
-                        <tr>
-                            <td>Left to use</td>
-                            <td></td>
-                            <td>n/a</td>
-                            <td>n/a</td>
+                            <td>Injections expired</td>
+                            <td>{brandDetails.zerpfyExpired}</td>
+                            <td>{brandDetails.antiquaExpired}</td>
+                            <td>{brandDetails.solarBuddhicaExpired}</td>
+                            <td>{brandDetails.totalExpiredToday}</td>
                         </tr>
                 </tbody>
-                <tfoot>
-                    <tr style={{fontWeight: 'bold'}}>
-                        <td>Total</td>
-                        <td>{state.totalGivenBy.length}</td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
                 </table>
                 </>
                 : null }
