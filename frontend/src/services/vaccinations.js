@@ -6,9 +6,5 @@ const getAll = async () => {
     return response.data
 }
 
-const getAllToday = async (day) => {
-    const response = await axios.get(baseUrl + '/vaccinated/' + day)
-    return response.data
-}
 
-export default {getAll, getAllToday}
+export default {getAll}

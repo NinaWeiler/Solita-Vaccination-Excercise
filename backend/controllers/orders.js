@@ -39,7 +39,7 @@ const vaccinations = async (id) => {
 orderRouter.get('/exp10/:day', async (request, response) => {
     const isValidDate = isValid(parseISO(request.params.day))
     try { 
-        if (isValidDate) {
+        if (isValidDate === true) {
         const orders = await Order.find({}).select('arrived vaccine injections vaccines id -_id')
         //find orders that arrived 20 days before selected day
         const filtered = orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(request.params.day), 20)))
@@ -50,7 +50,6 @@ orderRouter.get('/exp10/:day', async (request, response) => {
         }))
         response.json(filtered) 
         } else { return error } 
-        
     } catch (error) {
         response.status(404).send({ error: 'invalid date'})
     }

@@ -54,8 +54,8 @@ const Home = ({vaccinations, orders, loading}) => {
 
 
     const countBrandDetails = () => {
-        const orderBrand = (brand) => state.totalArrivedBy.filter(v => v.vaccine === brand)
-        const orderBrandToday = (brand) => state.arrivedToday.filter(v => v.vaccine === brand)
+        const orderBrand = (brand) => totalArrived().filter(v => v.vaccine === brand)
+        const orderBrandToday = (brand) => arrivedToday().filter(v => v.vaccine === brand)
         const totalInjections = (brand) =>  orderBrand(brand).map(a => a.injections).reduce(sumReducer, 0)
         const todaysInjections = (brand) => orderBrandToday(brand).map(a => a.injections).reduce(sumReducer, 0)
         expiredToday()
@@ -95,7 +95,7 @@ const Home = ({vaccinations, orders, loading}) => {
     
     useEffect(() => {
         async function fetchData()  {
-            await setState( prevState => ({
+             setState( prevState => ({
                 ...prevState,
                 totalGivenBy: totalGiven(),
                 totalArrivedBy: totalArrived(),
@@ -106,8 +106,7 @@ const Home = ({vaccinations, orders, loading}) => {
                 bottlesExpiredToday: bottlesExpiredOnToday(),
             }))
             countBrandDetails()
-
-            await expiresSoon()
+            expiresSoon()
             console.log('fetching done')
         }
         fetchData()

@@ -5,12 +5,6 @@ const vaccinationSchema = new mongoose.Schema({
     gender: String,
     sourceBottle: String,
     vaccinationDate: String,
-    order: [
-      {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Order'
-    }
-    ]
   })
 
   
@@ -23,8 +17,6 @@ const vaccinationSchema = new mongoose.Schema({
   
   vaccinationSchema.set('toJSON', {
     transform: (document, returnedObject) => {
-      //returnedObject.id = returnedObject._id.toString()
-      //delete returnedObject._id
       delete returnedObject.__v
     }
   })
