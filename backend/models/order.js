@@ -9,6 +9,8 @@ const orderSchema = new mongoose.Schema({
     injections: Number,
     arrived: String,
     injected: Number,
+    expired: Number,
+    vaccines: Array
   }, { toJSON: { virtuals: true }})
 
   

@@ -1,21 +1,18 @@
 const orderRouter = require('express').Router()
 const Order = require('../models/order')
 const Vaccination = require('../models/vaccination')
-const {format, parseISO, isBefore} = require('date-fns')
+const { parseISO, isBefore, isSameDay, subDays, addDays, isValid } = require('date-fns')
 
 
 // /api/orders
 
-//TODO:
-
-//get all orders
-
 //.select() determines which fields are returned
 //.lean() makes the request lighter
+
+//get all orders
 orderRouter.get('/', async (request, response) => {
     try {
-        const orders = await Order.find({}).select('arrived vaccine injections -_id').lean()
-        console.log(orders[1])
+        const orders = await Order.find({}).select('arrived id vaccine injections -_id').lean()
         return response.json(orders)
         //if(orders.length > 0) {response.json(orders)} else {return error}
     } catch (error) {
@@ -24,13 +21,13 @@ orderRouter.get('/', async (request, response) => {
     }
 })
 
-
-// return amount of injections given
+//helper function
+//return array of given injections
 const vaccinations = async (id) => {
     const data = await Vaccination.find({sourceBottle: id}).select('vaccinationDate -_id').lean()
     try {
         if(data) {
-            return data.length
+            return data
         } else {return 0}
     } catch (error) {
         { response.status(404).send({error: 'error matching injection to source bottle'})}   
@@ -38,79 +35,70 @@ const vaccinations = async (id) => {
 
 }  
 
-// fetches orders by day and returns each order with info about the given injections
-// add error handling!
-
-orderRouter.get('/expanded/:day', async (request, response) => {
-    const orders = await Order.find({}).select('arrived vaccine injections injected id -_id')
-    const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
-    const expanded = await Promise.all(filtered.map(async f => {
-        const data = await vaccinations(f.id)
-        return f.injected = data;
-    }))
-    response.json(filtered)
-})
-
-
-//orders with info by given date not working
-orderRouter.get('/expiredby/:day', async (request, response) => {
-    const orders = await Order.find({}).select('arrived injections injected id -_id')
-    const filtered = orders.filter(o => isBefore(parseISO(o.arrived), parseISO(request.params.day)))
-    const expanded = await Promise.all(filtered.map(async f => {
-        const data = await vaccinations(f.id)
-        return f.injected = data;
-    }))
-    response.json(filtered)
-})
-
-
-// vaccines arrived on given date
-orderRouter.get('/arrived/:day', async (request, response) => {
-    const orders = await Order.find({}).select('arrived vaccine injections -_id').lean()
-    const filtered = orders.filter(o => o.arrived.startsWith(request.params.day))
-    if (filtered.length > 0) {response.json(filtered)
-    } else {response.status(404).send({message: 'No orders arrived on given day'})}
- })
-
-orderRouter.get('/Zerpfy', async (request, response) => {
-    return null
-})
-
-//populate like this maybe
-   // const orders = await Order.find({}).populate({ path: 'vaccinations', select: 'id sourceBottle vaccinationDate'}).exec(function(error, orders) {
-    //    console.log(orders[8].vaccinations)
-        //response.json(orders.map(o => o.toJSON()))
-    //    response.json(orders)
-   // })
-
-orderRouter.get('/sorted', async (request, response) => {
-    const orders = await Order.find({})
+// injections expiring in 10 days 
+orderRouter.get('/exp10/:day', async (request, response) => {
+    const isValidDate = isValid(parseISO(request.params.day))
+    try { 
+        if (isValidDate) {
+        const orders = await Order.find({}).select('arrived vaccine injections vaccines id -_id')
+        //find orders that arrived 20 days before selected day
+        const filtered = orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(request.params.day), 20)))
+        const expanded = await Promise.all(filtered.map(async f => {
+            const data = await vaccinations(f.id)
+            const filterGiven = data.filter(d => isBefore(parseISO((d.vaccinationDate).slice(0, -8)), addDays(parseISO(request.params.day), 1)))
+            return f.vaccines.push(filterGiven.length)
+        }))
+        response.json(filtered) 
+        } else { return error } 
         
-    response.json(orders.sort((function(a,b) {
-        a = new Date(a.arrived)
-        b = new Date(b.arrived)
-        return a - b
-    })))
-}) 
-
-//bottle id
-orderRouter.get('/:id', async (request, response) => {
-    try {
-        const order = await Order.find({id: request.params.id})
-        if(order.length > 0) {response.json(order)} else {return error}
-    } 
-    catch (error) {
-        response.status(404).send({ error: 'unknown endpoint' })
+    } catch (error) {
+        response.status(404).send({ error: 'invalid date'})
     }
 })
 
-//orders and vaccinations
-orderRouter.get('/combined/:id', async (request, response) => {
+//expired today
+//find amount of orders and injections arrived 30 days ago, substact amount of vaccines injected
+//return amount of injections expired
+orderRouter.get('/expired/:day', async (request, response) => {
+    const isValidDate = isValid(parseISO(request.params.day))
     try {
-    const order = await Order.find({id: request.params.id})
-    const vaccines = await Vaccination.find({sourceBottle: request.params.id})
-    console.log('order', order[0])
-    console.log('vaccinations', vaccines)
+        if (isValidDate) {
+        const orders = await Order.find({}).select('arrived injections expired vaccine id -_id')
+        const filtered = orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(request.params.day), 30)))
+        const expanded = await Promise.all(filtered.map(async f => {
+            const data = await vaccinations(f.id)
+            return f.expired = f.injections - data.length;
+        }))
+        response.json(filtered)
+        } else { return error }
+    } catch (error) {
+        response.status(404).send({ error: 'invalid date'})
+    }
+})
+
+
+
+/* The following api calls take too long to process, or calling them as many times as needed
+    would be too much, so they are left out for a better user experience. */
+
+
+//returns info for calculating orders expired by given day in total
+//returns object with arrival day, amount of injections and amount of used injections
+orderRouter.get('/expiredby/:day', async (request, response) => {
+    const orders = await Order.find({}).select('arrived injections injected id -_id')
+    const filtered = orders.filter(o => isBefore(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(request.params.day), 30)))
+    const expanded = await Promise.all(filtered.map(async f => {
+        const data = await vaccinations(f.id)
+        return f.injected = data.length;
+    }))
+    response.json(filtered)
+})
+
+//finds object by bottle id, returns order object with a vaccines array with each given vaccination and their dates 
+orderRouter.get('/fullInfo/:id', async (request, response) => {
+    try {
+    const order = await Order.find({id: request.params.id}).select('arrived injections vaccines id -_id')
+    const vaccines = await Vaccination.find({sourceBottle: request.params.id}).select('sourceBottle vaccinationDate -_id').lean()
     //adds all objects in the array
     const data = order[0].vaccines.push(...vaccines)
     if(data) { response.json(order) }
@@ -118,22 +106,23 @@ orderRouter.get('/combined/:id', async (request, response) => {
     catch (error) { response.status(404).send({error: 'not found'})}
 })
 
-//order number
-orderRouter.get('/n/:orderNumber', async (request, response) => {
-    const orderNumber = request.params.orderNumber
-    const orders = await Order.find({orderNumber: orderNumber})
-    if (orders.length > 0) {response.json(orders)
-    } else response.status(404).send({error: 'Cannot find order with given number'})
-    
+
+//find specific bottle by id and return amount of injections that expired from that bottle
+orderRouter.get('/bottle/:id', async (request, response) => {
+    const order = await Order.find({id : request.params.id}).select('injections expired id -_id').lean()
+    const injected = await Vaccination.find({sourceBottle: request.params.id}).select('vaccinationDate -_id').lean()
+    order[0].expired = order[0].injections - injected.length
+    response.json(order[0].expired)
 })
 
+//returns all orders arrived on given date
+orderRouter.get('/arrivaldate/:day', async (request, response) => {
+    const orders = await Order.find({}).select('arrived vaccine injections -_id').lean()
+    const filtered = orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), (parseISO(request.params.day))))
+    if (filtered.length > 0) {response.json(filtered.length)
+    } else {response.status(404).send({message: 'No orders arrived on given day'})}
+ })
 
-
-// map the filtered orders and check for id match? 
-
-
-// should I keep different vaccine types separate? maybe. 
-  
 
 
 module.exports = orderRouter
