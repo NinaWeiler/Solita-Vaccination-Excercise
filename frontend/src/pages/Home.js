@@ -3,6 +3,7 @@ import { parseISO, isBefore, isAfter, addDays, isSameDay, subDays} from 'date-fn
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
 import '../components/CalendarStyle.css'
+import orderService from '../services/orders'
 
 import {useSelector, useDispatch} from 'react-redux'
 import {selectDay, selectedDayThis} from '../state/daySlice'
@@ -14,7 +15,21 @@ const initialState = {
     orderToCome: [],
     givenToday: [],
     arrivedToday: [],
-    bottlesExpired: []
+    bottlesExpired: [],
+    bottlesExpiredToday : [],
+    expiresin10Days: 0
+}
+
+const initialBrandDetails = {
+    zerpfyArrived: {totalOrders: 0, totalInjections: 0, todaysOrders: 0, todaysInjections: 0},
+    zerpfyGiven: [],
+    zerpfyExpired: [],
+    antiquaArrived:{totalOrders: 0, totalInjections: 0, todaysOrders: 0, todaysInjections: 0},
+    antiquaGiven: [],
+    antiquaExpired: [], 
+    solarBuddhicaArrived: {totalOrders: 0, totalInjections: 0, todaysOrders: 0, todaysInjections: 0},
+    solarBuddhicaGiven: [],
+    solarBuddhicaExpired: []
 }
 
 
@@ -22,41 +37,112 @@ const Home = ({vaccinations, orders, loading}) => {
     const day = useSelector(selectDay)
     const dispatch = useDispatch()
     const [state, setState] = useState(initialState)
+    const [brandDetails, setBrandDetails] = useState(initialBrandDetails)
+
+    const sumReducer = (sum, value) => {
+        return sum + value
+    } 
    
     const totalGiven = () => vaccinations.filter(a => isBefore(parseISO((a.vaccinationDate).slice(0, -8)), (addDays(parseISO(day), 1))))
     const totalArrived = () => orders.filter(o => isBefore(parseISO((o.arrived).slice(0, -8)), (addDays(parseISO(day), 1))))
     const ordersToCome = () => orders.filter(o => isAfter((parseISO((o.arrived).slice(0,-8))), (addDays((parseISO(day)), 1))))
     const givenToday = () => vaccinations.filter(v => isSameDay(parseISO((v.vaccinationDate).slice(0, -8)), parseISO(day)))
     const arrivedToday = () => orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), parseISO(day)))
-    const bottlesExpired = () => orders.filter(o => isBefore(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(day), 30)))
-    const orderBrand = (brand) => {
-        const data =  state.totalArrivedBy.filter(v => v.vaccine === brand)
-        return data
+    const bottlesExpired = () => orders.filter(o => isBefore(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(day), 29)))
+    const bottlesExpiredOnToday = () => orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(day), 30)))
+   
+   // move inside count brand details
+    const orderBrand = (brand) => state.totalArrivedBy.filter(v => v.vaccine === brand)
+    const orderBrandToday = (brand) => state.arrivedToday.filter(v => v.vaccine === brand)
+    const totalInjections = (brand) =>  orderBrand(brand).map(a => a.injections).reduce(sumReducer, 0)
+    const todaysInjections = (brand) => orderBrandToday(brand).map(a => a.injections).reduce(sumReducer, 0)
+    // total arrived  O
+    // arrived today  X
+
+    const InjectionsArrived = brandDetails.zerpfyArrived.totalInjections + brandDetails.antiquaArrived.totalInjections + brandDetails.solarBuddhicaArrived.totalInjections
+    const InjectionsArrivedToday = brandDetails.zerpfyArrived.todaysInjections + brandDetails.antiquaArrived.todaysInjections + brandDetails.solarBuddhicaArrived.totalInjections
+
+
+    const countBrandDetails = () => {
+        
+
+        setBrandDetails(prevState => ({
+            ...prevState,
+            zerpfyArrived: {totalOrders: orderBrand('Zerpfy').length , totalInjections: totalInjections('Zerpfy'), todaysOrders: orderBrandToday('Zerpfy').length, todaysInjections: todaysInjections('Zerpfy')},
+            antiquaArrived: {totalOrders: orderBrand('Antiqua').length , totalInjections: totalInjections('Antiqua'), todaysOrders: orderBrandToday('Antiqua').length, todaysInjections: todaysInjections('Antiqua')},
+            solarBuddhicaArrived: {totalOrders: orderBrand('SolarBuddhica').length , totalInjections: totalInjections('SolarBuddhica'), todaysOrders: orderBrandToday('SolarBuddhica').length, todaysInjections: todaysInjections('SolarBuddhica')},
+
+        }))
     }
+
+    
+    const expiresSoon = async () => {
+        try {
+            const data = await orderService.expiresIn10Days(day)
+            const amount = data.map(d => d.injections - d.vaccines)
+            return amount.reduce(sumReducer, 0)    //? a,b => a+b, 0
+        } catch (error) {
+            return 0
+        }
+    } 
+    
+    //given and expired from backend call
+    //expired soon to a different useEffect because it's slower
+    
     
     useEffect(() => {
         async function fetchData()  {
-        const given = totalGiven()
-        const arrived = totalArrived()
-        const vaccinationsGiven = givenToday()
-        const ordersArrived = arrivedToday()
-        const ordersLeft = ordersToCome()
-        const expiredBottles = bottlesExpired()
-        setState( prevState => ({
-            ...prevState,
-            totalGivenBy: given,
-            totalArrivedBy: arrived,
-            givenToday: vaccinationsGiven,
-            arrivedToday: ordersArrived,
-            ordersToCome: ordersLeft,
-            expiredBottles: expiredBottles
-        }))
-        console.log('fetching done')
+            const given = totalGiven()
+            const arrived = totalArrived()
+            const vaccinationsGiven = givenToday()
+            const ordersArrived = arrivedToday()
+            const ordersLeft = ordersToCome()
+            const expiredBottles = bottlesExpired()
+            const bottlesExpiredToday = bottlesExpiredOnToday()
+            //const expiresIn10Days = await expiresSoon()
+            countBrandDetails()
+            setState( prevState => ({
+                ...prevState,
+                totalGivenBy: totalGiven(),
+                totalArrivedBy: arrived,
+                givenToday: vaccinationsGiven,
+                arrivedToday: ordersArrived,
+                ordersToCome: ordersLeft,
+                expiredBottles: expiredBottles,
+                bottlesExpiredToday: bottlesExpiredToday,
+                //expiresin10Days: expiresIn10Days
+            }))
+            console.log('fetching done')
         }
         fetchData()
     }, [day, vaccinations, orders])
 
+    /*
+    const combinedInfo = async () => {
+        const data = await Promise.all(state.arrivedToday.map(async a => {
+            const result = await orderService.getCombinedInfo(a.id)
+            return result
+        }
+        ))
+        console.log('data', data)
+    }
 
+    /*
+    let fullInfo
+    const getFullInfo = async () => {
+        const data = await Promise.all(state.orders.map(async a => {
+            const result = await orderService.getFullInfo(a.id)
+            return result
+        }))
+        fullInfo = data.length
+        console.log('info', data.length)
+    } 
+    console.log('combined', combinedInfo()) */
+
+    
+        const d = subDays(parseISO(day), 30)
+        console.log('d', d)
+    //total vaccinations = order * injections
 
    console.log(loading)
     return (
@@ -74,10 +160,7 @@ const Home = ({vaccinations, orders, loading}) => {
                     <thead>
                         <tr>
                             <th></th>
-                            <th>On {day}</th>
-                            <th>Z</th>
-                            <th>A</th>
-                            <th>S</th>
+                            <th>On {day}</th>                         
                             <th>In total</th>
                         </tr>
                     </thead>
@@ -85,116 +168,84 @@ const Home = ({vaccinations, orders, loading}) => {
                         <tr>
                             <td>Orders arrived (bottle)</td>
                             <td>{state.arrivedToday.length}</td>
-                            <td>{orderBrand('Zerpfy').length}</td>
-                            <td>{orderBrand('Antiqua').length}</td>
-                            <td>{orderBrand('SolarBuddhica').length}</td>
+                            
                             <td style={{fontWeight: 'bold'}}>{state.totalArrivedBy.length}</td>
                         </tr>
                         <tr>
-                            <td>Vaccinations arrived</td>
-                            <td></td>
-                            <td>{orderBrand('Zerpfy').length * orderBrand('Zerpfy')[0].injections}</td>
-                            <td>inj</td>
-                            <td>inj</td>
-                            <td>n/a</td>
+                            <td>Injections in bottles</td>
+                            <td>{InjectionsArrived}</td>
+                            <td>{InjectionsArrivedToday}</td>
                         </tr>
                         <tr>
                             <td>Vaccinations given</td>
                             <td>{state.givenToday.length}</td>
-                            <td></td>
-                            <td>n/a</td>
-                            <td></td>
+                            
                             <td style={{fontWeight: 'bold'}}>{state.totalGivenBy.length}</td>
                         </tr>
-                        <tr>
-                            <td>Vaccinations left to use</td>
-                            <td></td>
-                            <td>arrived</td>
-                            <td> - injetions</td>
-                            <td>used</td>
-                        </tr>
+                        
                         <tr>
                             <td>Expired bottles</td>
-                            <td></td>
-                            <td>n/a</td>
-                            <td>n/a</td>
-                            <td></td>
+                            <td>{state.bottlesExpiredToday.length}</td>
                             <td style={{fontWeight: 'bold'}}>{state.expiredBottles.length}</td>
                         </tr>
                         <tr>
-                            <td>Injections expired before usage</td>
-                            <td></td>
-                            <td>n/a</td>
-                            <td>n/a</td>
-                            <td>n/a</td>
-                        </tr>
-                        <tr>
                             <td>Injections expiring in 10 days</td>
+                            
                             <td></td>
-                            <td>arrived on date</td>
-                            <td>not used</td>
-                            <td>n/a</td>
-                        </tr>
-                        <tr style={{fontWeight: 'bold'}}>
-                            <td colSpan='3'>Status on {day}</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Orders arrived</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Vaccinations given</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            {/*<td style={{fontWeight: 'bold'}}>{state.expiresin10Days}</td>*/}
                         </tr>
                 </tbody>
-                <tfoot>
-                    <tr style={{fontWeight: 'bold'}}>
-                        <td>Total</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
                 </table>
-                <p class="has-text-danger-dark is-size-5 ">Vaccinations:</p>
-                <p>Make separate tables per brand?</p>
+                <p class="has-text-danger-dark is-size-5 ">Details per producer for {day}:</p>
                 <table class='table is-hoverable'>
                     <thead>
                         <tr>
-                            <th>Brand</th>
-                            <th>Given</th>
-                            <th>Left to use</th>
-                            <th>Expired</th>
+                            <th></th>
+                            <th>Zerpfy</th>
+                            <th>Aniqua</th>
+                            <th>SolarBuddhica</th>
+                            <th>Total</th>
                         </tr>
                     </thead>
                 <tbody>
                         <tr>
-                            <td>Zerpfy</td>
+                            <td>Orders arrived Total</td>
+                            <td>{brandDetails.zerpfyArrived.totalOrders}</td>
+                            <td>{brandDetails.antiquaArrived.totalOrders}</td>
+                            <td>{brandDetails.solarBuddhicaArrived.totalOrders}</td>
+                        </tr>
+                        <tr>
+                            <td>Vaccinations arrived Total</td>
+                            <td>{brandDetails.zerpfyArrived.totalInjections}</td>
+                            <td>{brandDetails.antiquaArrived.totalInjections}</td>
+                            <td>{brandDetails.solarBuddhicaArrived.totalInjections}</td>
+                        </tr>
+                        <tr>
+                            <td>Orders today</td>
+                            <td>{brandDetails.zerpfyArrived.todaysOrders}</td>
+                            <td>{brandDetails.antiquaArrived.todaysOrders}</td>
+                            <td>{brandDetails.solarBuddhicaArrived.todaysOrders}</td>
+                        </tr>
+                        <tr>
+                            <td>Injections today</td>
+                            <td>{brandDetails.zerpfyArrived.todaysInjections}</td>
+                            <td>{brandDetails.antiquaArrived.todaysInjections}</td>
+                            <td>{brandDetails.solarBuddhicaArrived.todaysInjections}</td>
+                        </tr>
+                        <tr>
+                            <td>Given</td>
                             <td></td>
                             <td>n/a</td>
                             <td>n/a</td>
                         </tr>
                         <tr>
-                            <td>Antiqua</td>
+                            <td>Expired</td>
                             <td></td>
                             <td>n/a</td>
                             <td>n/a</td>
                         </tr>
                         <tr>
-                            <td>SolarBuddhica</td>
+                            <td>Left to use</td>
                             <td></td>
                             <td>n/a</td>
                             <td>n/a</td>
@@ -209,51 +260,6 @@ const Home = ({vaccinations, orders, loading}) => {
                     </tr>
                 </tfoot>
                 </table>
-                <br/>
-                <p class="has-text-danger-dark is-size-5 ">Orders:</p>
-                <table class='table is-hoverable'>
-                    <thead>
-                        <tr>
-                        <th colSpan='3' style={{textAlign: 'center'}}>Orders Arrived</th>    
-                        </tr>
-                    </thead>
-                    <thead>
-                        <tr>
-                            <th>Brand</th>
-                            <th>Injections per bottle</th>
-                            <th>Bottles</th>
-                        </tr>
-                    </thead>
-                <tbody>
-                        <tr>
-                            <td>Zerpfy</td>
-                            <td>{orderBrand('Zerpfy')[0].injections}</td>
-                            <td>{orderBrand('Zerpfy').length}</td>
-                        </tr>
-                        <tr>
-                            <td>Antiqua</td>
-                            <td>{orderBrand('Antiqua')[0].injections}</td>
-                            <td>{orderBrand('Antiqua').length}</td>
-                        </tr>
-                        <tr>
-                            <td>SolarBuddhica</td>
-                            <td>{orderBrand('SolarBuddhica')[0].injections}</td>
-                            <td>{orderBrand('SolarBuddhica').length}</td>
-                        </tr>
-                </tbody>
-                <tfoot>
-                    <tr style={{fontWeight: 'bold'}}>
-                        <td>Total</td>
-                        <td></td>
-                        <td >{state.totalArrivedBy.length}</td>
-                    </tr>
-                </tfoot>
-                </table>
-                <p>Orders on their way: {state.ordersToCome.length}</p>
-                <p class="has-text-danger-dark is-size-5 has-text-weight-medium">Selected day's numbers:</p>
-                <p>Vaccinations given on selected day: {state.givenToday.length}</p>
-                <p>Orders arrived on selected day: {state.arrivedToday.length}</p>
-
                 </>
                 : null }
                 </>
