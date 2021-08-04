@@ -1,5 +1,6 @@
 const config = require('./utils/config')
 const express = require('express')
+require('express-async-errors')
 const compression = require('compression')
 const app = express()
 const cors = require('cors')

@@ -21,6 +21,17 @@ orderRouter.get('/', async (request, response) => {
     }
 })
 
+orderRouter.get('/all', async (request, response) => {
+    try {
+        const orders = await Order.find({})
+        return response.json(orders)
+        //if(orders.length > 0) {response.json(orders)} else {return error}
+    } catch (error) {
+        response.status(404).send({ error: 'unknown endpoint' })
+
+    }
+})
+
 //helper function
 //return array of given injections
 const vaccinations = async (id) => {
@@ -118,7 +129,7 @@ orderRouter.get('/bottle/:id', async (request, response) => {
 orderRouter.get('/arrivaldate/:day', async (request, response) => {
     const orders = await Order.find({}).select('arrived vaccine injections -_id').lean()
     const filtered = orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), (parseISO(request.params.day))))
-    if (filtered.length > 0) {response.json(filtered.length)
+    if (filtered.length > 0) {response.json(filtered)
     } else {response.status(404).send({message: 'No orders arrived on given day'})}
  })
 
