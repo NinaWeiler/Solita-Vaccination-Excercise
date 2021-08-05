@@ -11,15 +11,11 @@ const { parseISO, isBefore, isSameDay, subDays, addDays, isValid } = require('da
 
 //get all orders
 orderRouter.get('/', async (request, response) => {
-    try {
-        const orders = await Order.find({}).select('arrived id vaccine injections -_id').lean()
-        return response.json(orders)
-        //if(orders.length > 0) {response.json(orders)} else {return error}
-    } catch (error) {
-        response.status(404).send({ error: 'unknown endpoint' })
+    const orders = await Order.find({}).select('arrived id vaccine injections -_id').lean()
+    return response.json(orders)
 
-    }
 })
+
 
 //helper function
 //return array of given injections
@@ -114,11 +110,16 @@ orderRouter.get('/bottle/:id', async (request, response) => {
     response.json(order[0].expired)
 })
 
+orderRouter.get('/b/:id', async (request, response) => {
+    const order = await Order.find({id : request.params.id})
+    response.json(order)
+})
+
 //returns all orders arrived on given date
 orderRouter.get('/arrivaldate/:day', async (request, response) => {
     const orders = await Order.find({}).select('arrived vaccine injections -_id').lean()
     const filtered = orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), (parseISO(request.params.day))))
-    if (filtered.length > 0) {response.json(filtered.length)
+    if (filtered.length > 0) {response.json(filtered)
     } else {response.status(404).send({message: 'No orders arrived on given day'})}
  })
 
