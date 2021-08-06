@@ -1,4 +1,6 @@
 import React from "react";
+import Tooltip from '@material-ui/core/Tooltip';
+
 
 
 const TableHeader = ({titles}) => {
@@ -6,8 +8,12 @@ const TableHeader = ({titles}) => {
         <thead>
             <tr>
                 <th></th>
-                {titles.map((title, index) => {
-                     return <th key={index}>{title}</th>
+                {titles.map((t, index) => {
+                     return (
+                         <Tooltip key={index} title={t.tooltip} aria-label={t.tooltip} placement='top' arrow>
+                            <th>{t.title}</th>
+                        </Tooltip>
+                     )
                 })}
             </tr>
       </thead>
@@ -42,7 +48,7 @@ const TableRow = ({title, values, total}) => {
 export const Table = ({ state, day }) => {
   return (
     <table class="table is-hoverable is-narrow">
-        <TableHeader titles={[`On ${day}`, 'In total']} />
+        <TableHeader titles={[{title: `On ${day}`, tooltip: 'Selected day'}, {title: 'In total', tooltip:'Status by selected day'}]} />
       <tbody>
           <TableRow title='Orders arrived (bottle)' values={[state.arrivedToday.length]}
             total={state.totalArrivedBy.length} />
@@ -68,7 +74,10 @@ export const Table = ({ state, day }) => {
 export const DetailsTable = ({ state, brandDetails, InjectionsArrivedToday, InjectionsArrived, day }) => {
     return (
         <table class='table is-hoverable is-narrow'>
-            <TableHeader titles={['Zerpfy','Antiqua', 'SolarBuddhica', 'Total']} />
+            <TableHeader titles={[{title: 'Zerpfy', tooltip:'5 injections per bottle'},
+            {title: 'Antiqua', tooltip:'4 injections per bottle'}, 
+            {title: 'SolarBuddhica', tooltip:'6 injections per bottle'},
+            {title: 'Total', tooltip: 'In total' }]} />
                 <tbody>
                     <SubHeader title={`Status on ${day}`}/>
                     <TableRow title='Orders arrived' values={[brandDetails.zerpfyArrived.todaysOrders, brandDetails.antiquaArrived.todaysOrders, brandDetails.solarBuddhicaArrived.todaysOrders]} 

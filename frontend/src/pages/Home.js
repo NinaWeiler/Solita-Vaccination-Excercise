@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import '../components/CalendarStyle.css'
 import orderService from '../services/orders'
 import { Table, DetailsTable } from '../components/Table'
-
+import CircularProgress from '@material-ui/core/CircularProgress';
 import {useSelector, useDispatch} from 'react-redux'
 import {selectDay, selectedDayThis} from '../state/daySlice'
 
@@ -126,23 +126,27 @@ const Home = ({vaccinations, orders, loading}) => {
         <div class="container">
         <div class="columns">
             <div class="column is-8">
-                <div class="box" style={{minHeight: '300px'}}>
-                {loading ? <button class="button is-loading is-centered"></button> 
+                <div class="box" style={{minHeight: '350px'}}>
+                {loading ? <CircularProgress color='info'/> 
                 : 
                 <>
                 {state.totalArrivedBy.length > 0 ? 
                 <>
-                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Status of Orders and Vaccinations</p>
+                <p class="has-text-danger-dark is-size-4 has-text-weight-medium" style={{marginBottom: '40px'}}>Status of Orders and Vaccinations</p>
                 <Table state={state} day={day}/>
                 {showDetails ? 
-                <>
+                <>  
+                <div class='content has-text-centered'>
                     <button class='button is-danger is-light' onClick={handleOnClick}>Hide details</button> 
-                    <p class="has-text-danger-dark is-size-5 ">Details per producer</p>
+                    </div>
+                    <p class="has-text-danger-dark is-size-5 " style={{marginBottom: '40px'}}>Details per producer</p>
                     <DetailsTable state={state} brandDetails={brandDetails} InjectionsArrived={InjectionsArrived}
                         InjectionsArrivedToday={InjectionsArrivedToday} day={day}/>
                 </>
                 :
+                <div class='content has-text-centered'>
                 <button class='button is-danger is-light' onClick={handleOnClick}>Show details</button> 
+                </div>
                 }
                 
                 </>
