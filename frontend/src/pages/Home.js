@@ -6,6 +6,7 @@ import '../components/CalendarStyle.css'
 import orderService from '../services/orders'
 import { Table, DetailsTable } from '../components/Table'
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Tooltip from '@material-ui/core/Tooltip';
 import {useSelector, useDispatch} from 'react-redux'
 import {selectDay, selectedDayThis} from '../state/daySlice'
 
@@ -38,6 +39,7 @@ const Home = ({vaccinations, orders, loading}) => {
     const [state, setState] = useState(initialState)
     const [brandDetails, setBrandDetails] = useState(initialBrandDetails)
     const [showDetails, setShowDetails] = useState(false)
+    const [loadingData, setLoadingData] = useState(false)
 
     const sumReducer = (sum, value) => {
         return sum + value
@@ -61,7 +63,6 @@ const Home = ({vaccinations, orders, loading}) => {
         const totalInjections = (brand) =>  orderBrand(brand).map(a => a.injections).reduce(sumReducer, 0)
         const todaysInjections = (brand) => orderBrandToday(brand).map(a => a.injections).reduce(sumReducer, 0)
         expiredToday()
-        console.log('branddetails', orderBrandToday('Zerpfy'))
 
         setBrandDetails(prevState => ({
             ...prevState,
@@ -73,9 +74,9 @@ const Home = ({vaccinations, orders, loading}) => {
     }
 
     const expiredToday = async () => {
+        setLoadingData(true)
         const data = await orderService.expiredToday(day)
         const filterBrand = (brand) => data.filter(d => d.vaccine === brand)
-        console.log('counting expiredToday')
         setBrandDetails(prevState => ({
             ...prevState,
             totalExpiredToday: data.map(d => d.expired).reduce(sumReducer, 0),
@@ -83,15 +84,17 @@ const Home = ({vaccinations, orders, loading}) => {
             antiquaExpired: filterBrand('Antiqua').map(v => v.expired).reduce(sumReducer, 0),
             solarBuddhicaExpired: filterBrand('SolarBuddhica').map(v => v.expired).reduce(sumReducer, 0)
         }))
+        setLoadingData(false)
     }
     
     const expiresSoon = async () => {
+        setLoadingData(true)
         const data = await orderService.expiresIn10Days(day)
-        console.log('counting expires soon')
         setState(prevState =>    ({
             ...prevState, 
             expiresin10Days: data.map(d => d.injections - d.vaccines).reduce(sumReducer, 0)
         }))
+        setLoadingData(false)
     } 
     
     
@@ -108,7 +111,6 @@ const Home = ({vaccinations, orders, loading}) => {
                 bottlesExpiredToday: bottlesExpiredOnToday(),
             }))
             expiresSoon()
-            console.log('fetching done')
         }
         fetchData()
 
@@ -124,27 +126,30 @@ const Home = ({vaccinations, orders, loading}) => {
 
     return (
         <div class="container">
-        <div class="columns">
+        <div class="columns is-centered-desktop">
             <div class="column is-8">
-                <div class="box" style={{minHeight: '350px'}}>
-                {loading ? <CircularProgress color='info'/> 
+                <div class="box">
+                {loading ? <div className='centerSpinner'><CircularProgress color='inherit' disableShrink/></div>
                 : 
                 <>
                 {state.totalArrivedBy.length > 0 ? 
                 <>
-                <p class="has-text-danger-dark is-size-4 has-text-weight-medium" style={{marginBottom: '40px'}}>Status of Orders and Vaccinations</p>
+                <h2 class="has-text-danger-dark is-size-4 has-text-weight-medium mb-6">
+                    Status of Orders and Vaccinations &emsp;
+                    {loadingData ? <CircularProgress size='1.4rem' color='inherit'/> : null}
+                    </h2>
                 <Table state={state} day={day}/>
                 {showDetails ? 
                 <>  
-                <div class='content has-text-centered'>
+                <div className='buttonStyle'>
                     <button class='button is-danger is-light' onClick={handleOnClick}>Hide details</button> 
                     </div>
-                    <p class="has-text-danger-dark is-size-5 " style={{marginBottom: '40px'}}>Details per producer</p>
+                    <h3 class="has-text-danger-dark is-size-5 mb-3">Details per producer</h3>
                     <DetailsTable state={state} brandDetails={brandDetails} InjectionsArrived={InjectionsArrived}
                         InjectionsArrivedToday={InjectionsArrivedToday} day={day}/>
                 </>
                 :
-                <div class='content has-text-centered'>
+                <div className='buttonStyle'>
                 <button class='button is-danger is-light' onClick={handleOnClick}>Show details</button> 
                 </div>
                 }
@@ -155,9 +160,12 @@ const Home = ({vaccinations, orders, loading}) => {
                 }
                 </div>
             </div>
-            <div class="column">
-               <div class="box">
-               <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Check status for any day</p>
+            <div class="column is-4-desktop is-8-tablet is-centered">
+               <div class="box" >
+                   <Tooltip placement='top' title='Check status for a date in between 02.01.2021 - 12.04.2021' aria-label='Check status for a date in between 02.01.2021 - 13.04.2021' arrow>
+                <div><h2 class="has-text-danger-dark is-size-4 has-text-weight-medium has-text-centered">Select a date</h2></div>
+               </Tooltip>
+               <div className='centerCalendar'>
                 <DatePicker 
                 selected={parseISO(day)} 
                 onChange={(d) => dispatch(selectedDayThis(d.toString()))} 
@@ -166,7 +174,9 @@ const Home = ({vaccinations, orders, loading}) => {
                 maxDate={new Date('2021-04-13')}
                 />
                 </div> 
+                </div>
             </div>
+
         </div>
         </div>
     )

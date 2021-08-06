@@ -1,5 +1,6 @@
 import React from "react";
 import Tooltip from '@material-ui/core/Tooltip';
+import './Styles.css'
 
 
 
@@ -47,6 +48,7 @@ const TableRow = ({title, values, total}) => {
 
 export const Table = ({ state, day }) => {
   return (
+      <div className='tableStyle'>
     <table class="table is-hoverable is-narrow">
         <TableHeader titles={[{title: `On ${day}`, tooltip: 'Selected day'}, {title: 'In total', tooltip:'Status by selected day'}]} />
       <tbody>
@@ -67,13 +69,15 @@ export const Table = ({ state, day }) => {
             total={state.expiresin10Days} />
       </tbody>
     </table>
+    </div>
   );
 };
 
 
 export const DetailsTable = ({ state, brandDetails, InjectionsArrivedToday, InjectionsArrived, day }) => {
     return (
-        <table class='table is-hoverable is-narrow'>
+        <div className='tableStyle'>
+        <table class='table is-hoverable is-narrow is-flex-shrink-3'>
             <TableHeader titles={[{title: 'Zerpfy', tooltip:'5 injections per bottle'},
             {title: 'Antiqua', tooltip:'4 injections per bottle'}, 
             {title: 'SolarBuddhica', tooltip:'6 injections per bottle'},
@@ -93,5 +97,6 @@ export const DetailsTable = ({ state, brandDetails, InjectionsArrivedToday, Inje
                         total={InjectionsArrived} />
                 </tbody>
                 </table>
+                </div>
     )
 }
