@@ -1,4 +1,7 @@
 
+.container {
+    min-height: 74vh;
+}
 .tableStyle {
     padding-bottom: 2rem;
 }
@@ -31,3 +34,9 @@
     align-items: center;
     }
 } 
+
+
+.footer {
+    padding: 2rem;
+    margin-top: 2rem;
+}

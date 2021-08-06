@@ -3,6 +3,7 @@ import vaccinationService from './services/vaccinations'
 import orderService from './services/orders'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
+import Footer from './components/Footer'
 import {useSelector, useDispatch} from 'react-redux'
 import {selectDay, selectedDayThis} from './state/daySlice'
 
@@ -39,6 +40,7 @@ const App = () => {
     <>
     <Navbar/>
     <Home vaccinations={vaccinations} orders={orders} loading={loading}/> 
+    <Footer />
     </>
   );
 }
