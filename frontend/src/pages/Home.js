@@ -4,9 +4,12 @@ import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
 import '../components/CalendarStyle.css'
 import orderService from '../services/orders'
-
+import { Table, DetailsTable } from '../components/Table'
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Tooltip from '@material-ui/core/Tooltip';
 import {useSelector, useDispatch} from 'react-redux'
 import {selectDay, selectedDayThis} from '../state/daySlice'
+import '../components/Styles.css'
 
 
 const initialState = {
@@ -36,6 +39,8 @@ const Home = ({vaccinations, orders, loading}) => {
     const dispatch = useDispatch()
     const [state, setState] = useState(initialState)
     const [brandDetails, setBrandDetails] = useState(initialBrandDetails)
+    const [showDetails, setShowDetails] = useState(false)
+    const [loadingData, setLoadingData] = useState(false)
 
     const sumReducer = (sum, value) => {
         return sum + value
@@ -50,7 +55,7 @@ const Home = ({vaccinations, orders, loading}) => {
     const bottlesExpiredOnToday = () => orders.filter(o => isSameDay(parseISO((o.arrived).slice(0, -8)), subDays(parseISO(day), 30)))
    
     const InjectionsArrived = brandDetails.zerpfyArrived.totalInjections + brandDetails.antiquaArrived.totalInjections + brandDetails.solarBuddhicaArrived.totalInjections
-    const InjectionsArrivedToday = brandDetails.zerpfyArrived.todaysInjections + brandDetails.antiquaArrived.todaysInjections + brandDetails.solarBuddhicaArrived.totalInjections
+    const InjectionsArrivedToday = brandDetails.zerpfyArrived.todaysInjections + brandDetails.antiquaArrived.todaysInjections + brandDetails.solarBuddhicaArrived.todaysInjections
 
 
     const countBrandDetails = () => {
@@ -59,7 +64,6 @@ const Home = ({vaccinations, orders, loading}) => {
         const totalInjections = (brand) =>  orderBrand(brand).map(a => a.injections).reduce(sumReducer, 0)
         const todaysInjections = (brand) => orderBrandToday(brand).map(a => a.injections).reduce(sumReducer, 0)
         expiredToday()
-        console.log('branddetails', orderBrandToday('Zerpfy'))
 
         setBrandDetails(prevState => ({
             ...prevState,
@@ -71,9 +75,9 @@ const Home = ({vaccinations, orders, loading}) => {
     }
 
     const expiredToday = async () => {
+        setLoadingData(true)
         const data = await orderService.expiredToday(day)
         const filterBrand = (brand) => data.filter(d => d.vaccine === brand)
-        console.log('counting expiredToday')
         setBrandDetails(prevState => ({
             ...prevState,
             totalExpiredToday: data.map(d => d.expired).reduce(sumReducer, 0),
@@ -81,15 +85,17 @@ const Home = ({vaccinations, orders, loading}) => {
             antiquaExpired: filterBrand('Antiqua').map(v => v.expired).reduce(sumReducer, 0),
             solarBuddhicaExpired: filterBrand('SolarBuddhica').map(v => v.expired).reduce(sumReducer, 0)
         }))
+        setLoadingData(false)
     }
     
     const expiresSoon = async () => {
+        setLoadingData(true)
         const data = await orderService.expiresIn10Days(day)
-        console.log('counting expires soon')
         setState(prevState =>    ({
             ...prevState, 
             expiresin10Days: data.map(d => d.injections - d.vaccines).reduce(sumReducer, 0)
         }))
+        setLoadingData(false)
     } 
     
     
@@ -105,121 +111,62 @@ const Home = ({vaccinations, orders, loading}) => {
                 expiredBottles: bottlesExpired(),
                 bottlesExpiredToday: bottlesExpiredOnToday(),
             }))
-            countBrandDetails()
             expiresSoon()
-            console.log('fetching done')
         }
         fetchData()
 
     }, [day, vaccinations, orders])
 
-    
+    useEffect(() => {
+        countBrandDetails()
+    }, [showDetails])
+
+    const handleOnClick = () => {
+        setShowDetails(!showDetails)
+    }
 
     return (
         <div class="container">
-        <div class="columns">
-            <div class="column is-8">
-                <div class="box" style={{minHeight: '300px'}}>
-                {loading ? <button class="button is-loading is-centered"></button> 
+        <div class="columns is-centered-desktop">
+            <div class="column is-8 is-centered-mobile">
+                <div class="box">
+                {loading ? <div className='centerSpinner'><CircularProgress color='primary' disableShrink/></div>
                 : 
                 <>
                 {state.totalArrivedBy.length > 0 ? 
                 <>
-                <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Vaccination and Order status on {day}</p>
-                <table class='table is-hoverable is-narrow'>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>On {day}</th>                         
-                            <th>In total</th>
-                        </tr>
-                    </thead>
-                <tbody>
-                        <tr>
-                            <td>Orders arrived (bottle)</td>
-                            <td>{state.arrivedToday.length}</td>
-                            
-                            <td style={{fontWeight: 'bold'}}>{state.totalArrivedBy.length}</td>
-                        </tr>
-                        <tr>
-                            <td>Injections in bottles</td>
-                            <td>{InjectionsArrivedToday}</td>
-                            <td style={{fontWeight: 'bold'}}>{InjectionsArrived}</td>
-                        </tr>
-                        <tr>
-                            <td>Vaccinations given</td>
-                            <td>{state.givenToday.length}</td>
-                            
-                            <td style={{fontWeight: 'bold'}}>{state.totalGivenBy.length}</td>
-                        </tr>
-                        
-                        <tr>
-                            <td>Expired bottles</td>
-                            <td>{state.bottlesExpiredToday.length}</td>
-                            <td style={{fontWeight: 'bold'}}>{state.expiredBottles.length}</td>
-                        </tr>
-                        <tr>
-                            <td>Injections expiring in 10 days</td>
-                            
-                            <td></td>
-                            <td style={{fontWeight: 'bold'}}>{state.expiresin10Days}</td>
-                        </tr>
-                </tbody>
-                </table>
-                <p class="has-text-danger-dark is-size-5 ">Details per producer for {day}:</p>
-                <table class='table is-hoverable'>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Zerpfy</th>
-                            <th>Aniqua</th>
-                            <th>SolarBuddhica</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                <tbody>
-                        <tr>
-                            <td>Orders arrived Total</td>
-                            <td>{brandDetails.zerpfyArrived.totalOrders}</td>
-                            <td>{brandDetails.antiquaArrived.totalOrders}</td>
-                            <td>{brandDetails.solarBuddhicaArrived.totalOrders}</td>
-                        </tr>
-                        <tr>
-                            <td>Vaccinations arrived Total</td>
-                            <td>{brandDetails.zerpfyArrived.totalInjections}</td>
-                            <td>{brandDetails.antiquaArrived.totalInjections}</td>
-                            <td>{brandDetails.solarBuddhicaArrived.totalInjections}</td>
-                        </tr>
-                        <tr>
-                            <td>Orders today</td>
-                            <td>{brandDetails.zerpfyArrived.todaysOrders}</td>
-                            <td>{brandDetails.antiquaArrived.todaysOrders}</td>
-                            <td>{brandDetails.solarBuddhicaArrived.todaysOrders}</td>
-                        </tr>
-                        <tr>
-                            <td>Injections arrived today</td>
-                            <td>{brandDetails.zerpfyArrived.todaysInjections}</td>
-                            <td>{brandDetails.antiquaArrived.todaysInjections}</td>
-                            <td>{brandDetails.solarBuddhicaArrived.todaysInjections}</td>
-                        </tr>
-                        <tr>
-                            <td>Injections expired</td>
-                            <td>{brandDetails.zerpfyExpired}</td>
-                            <td>{brandDetails.antiquaExpired}</td>
-                            <td>{brandDetails.solarBuddhicaExpired}</td>
-                            <td>{brandDetails.totalExpiredToday}</td>
-                        </tr>
-                </tbody>
-                </table>
+                <h2 class="has-text-danger-dark is-size-4 has-text-weight-medium mb-6">
+                    Status of Orders and Vaccinations &emsp;
+                    {loadingData ? <CircularProgress size='1.4rem' color='inherit'/> : null}
+                    </h2>
+                <Table state={state} day={day}/>
+                {showDetails ? 
+                <>  
+                <div className='buttonStyle'>
+                    <button class='button is-danger is-light' onClick={handleOnClick}>Hide details</button> 
+                    </div>
+                    <h3 class="has-text-danger-dark is-size-5 mb-3">Details per manufacturer</h3>
+                    <DetailsTable state={state} brandDetails={brandDetails} InjectionsArrived={InjectionsArrived}
+                        InjectionsArrivedToday={InjectionsArrivedToday} day={day}/>
+                </>
+                :
+                <div className='buttonStyle'>
+                <button class='button is-danger is-light' onClick={handleOnClick}>Show details</button> 
+                </div>
+                }
+                
                 </>
                 : null }
                 </>
                 }
                 </div>
             </div>
-            <div class="column">
-               <div class="box">
-               <p class="has-text-danger-dark is-size-4 has-text-weight-medium">Check status for any day</p>
+            <div class="column is-4-desktop is-8-tablet is-centered">
+               <div class="box" >
+                   <Tooltip placement='top' title='Check status for a date in between 02.01.2021 - 12.04.2021' aria-label='Check status for a date in between 02.01.2021 - 13.04.2021' arrow>
+                <div><h2 class="has-text-danger-dark is-size-4 has-text-weight-medium has-text-centered">Select a date</h2></div>
+               </Tooltip>
+               <div className='centerCalendar'>
                 <DatePicker 
                 selected={parseISO(day)} 
                 onChange={(d) => dispatch(selectedDayThis(d.toString()))} 
@@ -228,7 +175,9 @@ const Home = ({vaccinations, orders, loading}) => {
                 maxDate={new Date('2021-04-13')}
                 />
                 </div> 
+                </div>
             </div>
+
         </div>
         </div>
     )

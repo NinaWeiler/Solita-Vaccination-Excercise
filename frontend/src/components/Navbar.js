@@ -1,17 +1,16 @@
 import React from 'react'
+import './Styles.css'
+import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 
 const Navbar = () => {
     return (
-        <nav class="navbar is-spaced" role="navigation" aria-label="main navigation">
+        <nav class="navbar is-spaced has-shadow mb-6" role="navigation" aria-label="main navigation">
             <div class="navbar-brand">
-                <h1 class="title has-text-danger-dark   ">Vaxxy</h1>
-            </div>
-            <div class="navbar-end">
                 <div class="navbar-item">
-                    <a href="#">Home</a>
+                    <LocalHospitalIcon fontSize='large' color='primary'/>
                 </div>
                 <div class="navbar-item">
-                    <a href="#">Statistics</a>
+                <h1 class="title has-text-danger-dark ">Vaxxy</h1>
                 </div>
             </div>
         </nav>
