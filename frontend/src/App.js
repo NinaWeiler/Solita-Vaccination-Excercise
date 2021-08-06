@@ -4,20 +4,9 @@ import orderService from './services/orders'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Footer from './components/Footer'
-import {useSelector, useDispatch} from 'react-redux'
-import {selectDay, selectedDayThis} from './state/daySlice'
-
-//import Calendar from './pages/Calendar'
-
-//Last order arrived on 2021-04-12 
-//First order arrived on 2021-01-02
-//First vaccination on 2021-01-02
-//Last vaccination on 2021-04-12
 
 
 const App = () => {
-  const day = useSelector(selectDay)
-  const dispatch = useDispatch()
   const [vaccinations, setVaccinations] = useState([])
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(false)

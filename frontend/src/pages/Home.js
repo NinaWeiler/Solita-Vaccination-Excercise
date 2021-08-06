@@ -9,6 +9,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Tooltip from '@material-ui/core/Tooltip';
 import {useSelector, useDispatch} from 'react-redux'
 import {selectDay, selectedDayThis} from '../state/daySlice'
+import '../components/Styles.css'
 
 
 const initialState = {
@@ -127,9 +128,9 @@ const Home = ({vaccinations, orders, loading}) => {
     return (
         <div class="container">
         <div class="columns is-centered-desktop">
-            <div class="column is-8">
+            <div class="column is-8 is-centered-mobile">
                 <div class="box">
-                {loading ? <div className='centerSpinner'><CircularProgress color='inherit' disableShrink/></div>
+                {loading ? <div className='centerSpinner'><CircularProgress color='primary' disableShrink/></div>
                 : 
                 <>
                 {state.totalArrivedBy.length > 0 ? 
@@ -144,7 +145,7 @@ const Home = ({vaccinations, orders, loading}) => {
                 <div className='buttonStyle'>
                     <button class='button is-danger is-light' onClick={handleOnClick}>Hide details</button> 
                     </div>
-                    <h3 class="has-text-danger-dark is-size-5 mb-3">Details per producer</h3>
+                    <h3 class="has-text-danger-dark is-size-5 mb-3">Details per manufacturer</h3>
                     <DetailsTable state={state} brandDetails={brandDetails} InjectionsArrived={InjectionsArrived}
                         InjectionsArrivedToday={InjectionsArrivedToday} day={day}/>
                 </>
