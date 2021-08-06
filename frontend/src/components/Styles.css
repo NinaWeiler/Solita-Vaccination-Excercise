@@ -1,7 +1,4 @@
 
-.container {
-    min-height: 68vh;
-}
 .tableStyle {
     padding-bottom: 2rem;
 }
@@ -19,14 +16,13 @@
 
 }
 
-.centerSpinner {
+.spinnerStyle {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 330px;
 
 }
-
 
 @media screen and (min-width: 600px) and (max-width: 1025px) {
     .columns {
@@ -35,11 +31,15 @@
     }
 } 
 
+/* overriding Bulma and Mui default styles */
+
+.container {
+    min-height: 68vh;
+}
 
 .footer {
     padding: 2rem;
     margin-top: 2rem;
-    /*background-color: #ededed; */
 }
 
 strong {

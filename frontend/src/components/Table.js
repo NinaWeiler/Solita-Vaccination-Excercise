@@ -2,8 +2,6 @@ import React from "react";
 import Tooltip from '@material-ui/core/Tooltip';
 import './Styles.css'
 
-
-
 const TableHeader = ({titles}) => {
     return (
         <thead>
@@ -49,26 +47,19 @@ const TableRow = ({title, values, total}) => {
 export const Table = ({ state, day }) => {
   return (
       <div className='tableStyle'>
-    <table class="table is-hoverable is-narrow">
+        <table class="table is-hoverable is-narrow">
         <TableHeader titles={[{title: `On ${day}`, tooltip: 'Selected day'}, {title: 'In total', tooltip:'Status by selected day'}]} />
-      <tbody>
-          <TableRow title='Orders arrived (bottle)' values={[state.arrivedToday.length]}
-            total={state.totalArrivedBy.length} />
-        {/*
-        <tr>
-          <td>Injections in bottles</td>
-          <td>{InjectionsArrivedToday}</td>
-          <td style={{ fontWeight: "bold" }}>{InjectionsArrived}</td>
-        </tr>
-        */}
-        <TableRow title='Vaccinations given' values={[state.givenToday.length]}
-            total={state.totalGivenBy.length} />
-        <TableRow title='Bottles expired' values={[state.bottlesExpiredToday.length]}
-            total={state.expiredBottles.length} />
-        <TableRow title='Vaccinations expiring in 10 days' values={['']}
-            total={state.expiresin10Days} />
-      </tbody>
-    </table>
+            <tbody>
+                <TableRow title='Orders arrived (bottle)' values={[state.arrivedToday.length]}
+                    total={state.totalArrivedBy.length} />
+                <TableRow title='Vaccinations given' values={[state.givenToday.length]}
+                    total={state.totalGivenBy.length} />
+                <TableRow title='Bottles expired' values={[state.bottlesExpiredToday.length]}
+                    total={state.expiredBottles.length} />
+                <TableRow title='Vaccinations expiring in 10 days' values={['']}
+                    total={state.expiresin10Days} />
+            </tbody>
+        </table>
     </div>
   );
 };
@@ -96,7 +87,7 @@ export const DetailsTable = ({ state, brandDetails, InjectionsArrivedToday, Inje
                     <TableRow title='Vaccinations arrived' values={[brandDetails.zerpfyArrived.totalInjections, brandDetails.antiquaArrived.totalInjections, brandDetails.solarBuddhicaArrived.totalInjections]}
                         total={InjectionsArrived} />
                 </tbody>
-                </table>
-                </div>
+        </table>
+        </div>
     )
 }

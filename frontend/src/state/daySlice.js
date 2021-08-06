@@ -1,8 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit'
 import { parseISO, format} from 'date-fns'
 
-
-
+//reducer for changing selected day in calendar
 export const daySlice = createSlice({
     name: 'day',
     initialState: {
@@ -10,13 +9,13 @@ export const daySlice = createSlice({
 
     },
     reducers: {
-        selectedDayThis: (state, action) => {
+        changeDay: (state, action) => {
             state.selectedDay = format(new Date(action.payload), "yyyy-MM-dd")
         }
     }
 })
 
-export const { selectedDayThis } = daySlice.actions
+export const { changeDay } = daySlice.actions
 
 export const selectDay = state => state.day.selectedDay
 
