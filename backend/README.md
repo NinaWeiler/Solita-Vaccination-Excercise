@@ -1,16 +1,10 @@
 # Vaxxy App
+This is the backend of the Vaxxy App. Instructions for running the whole app can be found in the main [repository](https://github.com/NinaWeiler/Solita-Vaccination-Excercise).
 ## Project Description
 [Programming exercise](https://github.com/solita/vaccine-exercise-2021) for applying to the [Solita Dev Academy 2021](https://www.solita.fi/positions/akatemiasta-nostetta-devaajan-uralle-4447301003/).
 
 The aim of the project was to create a web application for presenting some interesting data about the vaccinations. 
 
--> Add screen shot of app
-
-## Demo
-A working live version can be found at 
-``` 
-A live version of the app is going to be running on heroku. A link will be provided soon.
-```
 ## Technologies
 * React
 * Nodejs
@@ -23,7 +17,7 @@ A live version of the app is going to be running on heroku. A link will be provi
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Setup
+## Backendend setup
 The project consists of a frontend and backend folder. 
 
 * Clone the project repository
@@ -32,13 +26,7 @@ The project consists of a frontend and backend folder.
 # Clone this repository
 C:/> git clone https://github.com/NinaWeiler/Solita-Vaccination-Excercise.git
 
-# Go into the frontend folder
-C:/> cd Solita-Vaccination-Excercise/frontend
-
-# Install dependencies 
-C:/> npm install
-
-# Same for the backend folder
+# Go to the backend folder
 C:/> Solita-Vaccination-Exercise/backend
 
 # Install dependencies 
@@ -51,12 +39,13 @@ C:/> npm install
 C:/> Solita-Vaccination-Exercise/backend
 C:/> npm run dev
 ```
-* Navigate to the frontend folder in a different terminal window and run frontend with the command:
+
+If you are also running the [frontend](https://github.com/NinaWeiler/Solita-Vaccination-Excercise/tree/main/frontend), you can open [http://localhost:3000](http://localhost:3000) to view the app in the browser.
+
+The backend runs on port 3005 and you can view api endpoints in the browser by navigatig to for example: 
 ```
-C:/> Solita-Vaccination-Exercise/frontend
-C:/> npm start
+localhost:3005/api/orders
 ```
-Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ### Running tests:
 The app has tests for the backend. You can all run the tests in the backend directory with the command:
