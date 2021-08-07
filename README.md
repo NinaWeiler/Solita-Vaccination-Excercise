@@ -1,10 +1,10 @@
 # Vaxxy App
+![Screenshot](./images/vaxxy.png)
+
 ## Project Description
 [Programming exercise](https://github.com/solita/vaccine-exercise-2021) for applying to the [Solita Dev Academy 2021](https://www.solita.fi/positions/akatemiasta-nostetta-devaajan-uralle-4447301003/).
 
 The aim of the project was to create a web application for presenting some interesting data about the vaccinations. 
-
--> Add screen shot of app
 
 ## Demo
 A working live version can be found at 
