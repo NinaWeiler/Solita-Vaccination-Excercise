@@ -12,6 +12,7 @@ const App = () => {
   const [loading, setLoading] = useState(false)
 
   
+  //fetch all orders and vaccinations
   useEffect(() => {
     async function fetchData()  {
       setLoading(true)

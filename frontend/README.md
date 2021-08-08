@@ -1,3 +1,50 @@
+# Vaxxy App
+This is the frontend of the Vaxxy App. Instructions for running the whole app can be found in the main [repository](https://github.com/NinaWeiler/Solita-Vaccination-Excercise).
+## Project Description
+[Programming exercise](https://github.com/solita/vaccine-exercise-2021) for applying to the [Solita Dev Academy 2021](https://www.solita.fi/positions/akatemiasta-nostetta-devaajan-uralle-4447301003/).
+
+The aim of the project was to create a web application for presenting some interesting data about the vaccinations. 
+
+## Technologies
+* React
+* Nodejs
+* Express
+* Redux
+* MongoDB
+* NPM 
+* Bulma.io
+* Material UI
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Frontend setup
+The project consists of a frontend and backend folder. 
+
+* Clone the project repository
+* Install the dependencies in the frontend and backend with npm. 
+```
+# Clone this repository
+C:/> git clone https://github.com/NinaWeiler/Solita-Vaccination-Excercise.git
+
+# Go into the frontend folder
+C:/> cd Solita-Vaccination-Excercise/frontend
+
+# Install dependencies 
+C:/> npm install
+```
+
+### Running the frontend
+
+* Navigate to the frontend folder and run frontend with the command:
+```
+C:/> Solita-Vaccination-Exercise/frontend
+C:/> npm start
+```
+If you are also running the [backend](https://github.com/NinaWeiler/Solita-Vaccination-Excercise/tree/main/backend), you can open [http://localhost:3000](http://localhost:3000) to view the app in the browser.
+
+## Author
+Nina Weiler
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
