@@ -18,4 +18,5 @@ const expiredToday = async (day) => {
 }
 
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default { getAll, expiredToday, expiresIn10Days }

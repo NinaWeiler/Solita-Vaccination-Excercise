@@ -1,3 +1,4 @@
+const path = require('path')
 const config = require('./utils/config')
 const express = require('express')
 require('express-async-errors')
@@ -10,7 +11,9 @@ const middleware = require('./utils/middleware')
 
 
 app.use(cors())
-app.use(express.static('build'))
+const buildPath = path.join(__dirname, '..', 'build');
+app.use(express.static(buildPath));
+app.use(express.static(buildPath))
 app.use(express.json())
 app.use(middleware.requestLogger)
 
