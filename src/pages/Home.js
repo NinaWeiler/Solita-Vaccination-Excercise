@@ -58,6 +58,7 @@ const Home = ({vaccinations, orders, loading}) => {
         }
         fetchData()
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [day, vaccinations, orders])
 
 
