@@ -1,5 +1,9 @@
 # Vaxxy App
 This is the backend of the Vaxxy App. Instructions for running the whole app can be found in the main [repository](https://github.com/NinaWeiler/Solita-Vaccination-Excercise).
+A working live version can be found at:
+``` 
+[https://vaxxy.herokuapp.com/](https://vaxxy.herokuapp.com/)
+```
 ## Project Description
 [Programming exercise](https://github.com/solita/vaccine-exercise-2021) for applying to the [Solita Dev Academy 2021](https://www.solita.fi/positions/akatemiasta-nostetta-devaajan-uralle-4447301003/).
 

@@ -7,9 +7,9 @@
 The aim of the project was to create a web application for presenting some interesting data about the vaccinations. 
 
 ## Demo
-A working live version can be found at 
+A working live version can be found at: 
 ``` 
-A live version of the app is going to be running on heroku. A link will be provided soon.
+[https://vaxxy.herokuapp.com/](https://vaxxy.herokuapp.com/)
 ```
 ## Technologies
 * React
