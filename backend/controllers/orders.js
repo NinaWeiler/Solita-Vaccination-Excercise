@@ -45,7 +45,8 @@ orderRouter.get('/exp10/:day', async (request, response) => {
             return f.vaccines.push(filterGiven.length)
         }))
         response.json(filtered) 
-        } 
+        // eslint-disable-next-line no-undef
+        } else {return error}
     } catch (error) {
         response.status(404).send({ error: 'invalid date'})
     }
@@ -65,7 +66,8 @@ orderRouter.get('/expired/:day', async (request, response) => {
             return f.expired = f.injections - data.length;
         }))
         response.json(filtered)
-        } 
+        // eslint-disable-next-line no-undef
+        } else { return error }
     } catch (error) {
         response.status(404).send({ error: 'invalid date'})
     }
