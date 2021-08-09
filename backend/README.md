@@ -14,14 +14,14 @@ The aim of the project was to create a web application for presenting some inter
 * NPM 
 * Bulma.io
 * Material UI
+* Jest
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Backendend setup
-The project consists of a frontend and backend folder. 
 
 * Clone the project repository
-* Install the dependencies in the frontend and backend with npm. 
+* Install the dependencies in the backend with npm. 
 ```
 # Clone this repository
 C:/> git clone https://github.com/NinaWeiler/Solita-Vaccination-Excercise.git
@@ -40,11 +40,11 @@ C:/> Solita-Vaccination-Exercise/backend
 C:/> npm run dev
 ```
 
-If you are also running the [frontend](https://github.com/NinaWeiler/Solita-Vaccination-Excercise/tree/main/frontend), you can open [http://localhost:3000](http://localhost:3000) to view the app in the browser.
+If you are also running the [frontend](https://github.com/NinaWeiler/Solita-Vaccination-Excercise), you can open [http://localhost:5000](http://localhost:5000) to view the app in the browser.
 
-The backend runs on port 3005 and you can view api endpoints in the browser by navigatig to for example: 
+The backend runs on port 5000 and you can view api endpoints in the browser by navigatig to for example: 
 ```
-localhost:3005/api/orders
+localhost:5000/api/orders
 ```
 
 ### Running tests:
