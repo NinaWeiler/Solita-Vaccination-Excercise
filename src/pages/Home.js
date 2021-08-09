@@ -53,14 +53,13 @@ const Home = ({vaccinations, orders, loading}) => {
             expiresSoon()
             if (showDetails === true || day === '2021-01-02') {
                 countBrandDetails()
+                expiredToday()
             }
-
         }
         fetchData()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [day, vaccinations, orders])
-
+    }, [day, showDetails, orders])
 
     //helper function for adding up values
     const sumReducer = (sum, value) => {
@@ -91,7 +90,6 @@ const Home = ({vaccinations, orders, loading}) => {
         const orderBrandToday = (brand) => arrivedToday().filter(v => v.vaccine === brand)
         const totalInjections = (brand) =>  orderBrand(brand).map(a => a.injections).reduce(sumReducer, 0)
         const todaysInjections = (brand) => orderBrandToday(brand).map(a => a.injections).reduce(sumReducer, 0)
-        expiredToday()
 
         setBrandDetails(prevState => ({
             ...prevState,
