@@ -20,13 +20,13 @@ orderRouter.get('/', async (request, response) => {
 //helper function
 //return array of given injections
 const vaccinations = async (id) => {
-    const data = await Vaccination.find({sourceBottle: id}).select('vaccinationDate -_id').lean()
+    const response = await Vaccination.find({sourceBottle: id}).select('vaccinationDate -_id').lean()
     try {
-        if(data) {
-            return data
+        if(response) {
+            return response
         } else {return 0}
     } catch (error) {
-        { response.status(404).send({error: 'error matching injection to source bottle'})}   
+        return response.status(404).send({error: 'error matching injection to source bottle'})  
     }
 
 }  
@@ -45,7 +45,7 @@ orderRouter.get('/exp10/:day', async (request, response) => {
             return f.vaccines.push(filterGiven.length)
         }))
         response.json(filtered) 
-        } else { return error } 
+        } 
     } catch (error) {
         response.status(404).send({ error: 'invalid date'})
     }
@@ -65,7 +65,7 @@ orderRouter.get('/expired/:day', async (request, response) => {
             return f.expired = f.injections - data.length;
         }))
         response.json(filtered)
-        } else { return error }
+        } 
     } catch (error) {
         response.status(404).send({ error: 'invalid date'})
     }
