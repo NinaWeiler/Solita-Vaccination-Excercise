@@ -60,6 +60,8 @@ To run an individual test or set of tests run:
 C:/> Solita-Vaccination-Exercise/backend
 C:/> npm test -- -t 'name of test'
 ```
+### Additional information
+The .env file has been added to git for the purpose that anyone can run the project and tests locally. Otherwise the environment variables would be gitignored.
 
 ## Author
 Nina Weiler
