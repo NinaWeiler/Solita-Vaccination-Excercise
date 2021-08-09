@@ -95,7 +95,6 @@ describe("Error handling", () => {
   });
   test("invalid date returns error message", async () => {
     const response = await api.get("/api/orders/expired/20-02-30");
-    console.log("response.text", response);
     expect(response.text).toBe('{"error":"invalid date"}');
   }); 
 });
