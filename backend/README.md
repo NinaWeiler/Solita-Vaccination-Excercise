@@ -1,9 +1,7 @@
 # Vaxxy App
 This is the backend of the Vaxxy App. Instructions for running the whole app can be found in the main [repository](https://github.com/NinaWeiler/Solita-Vaccination-Excercise).
-A working live version can be found at:
-``` 
-[https://vaxxy.herokuapp.com/](https://vaxxy.herokuapp.com/)
-```
+A working live version can be found at: [vaxxy.herokuapp.com/](https://vaxxy.herokuapp.com/)
+
 ## Project Description
 [Programming exercise](https://github.com/solita/vaccine-exercise-2021) for applying to the [Solita Dev Academy 2021](https://www.solita.fi/positions/akatemiasta-nostetta-devaajan-uralle-4447301003/).
 
@@ -52,7 +50,7 @@ localhost:5000/api/orders
 ```
 
 ### Running tests:
-The app has tests for the backend. You can all run the tests in the backend directory with the command:
+The app has tests for the backend. You can run all the tests in the backend directory with the command:
 ```
 C:/> Solita-Vaccination-Exercise/backend
 C:/> npm test

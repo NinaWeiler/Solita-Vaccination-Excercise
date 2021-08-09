@@ -7,10 +7,8 @@
 The aim of the project was to create a web application for presenting some interesting data about the vaccinations. 
 
 ## Demo
-A working live version can be found at: 
-``` 
-[https://vaxxy.herokuapp.com/](https://vaxxy.herokuapp.com/)
-```
+A working live version can be found at [vaxxy.herokuapp.com/](https://vaxxy.herokuapp.com/)
+
 ## Technologies
 * React
 * Nodejs
@@ -68,7 +66,7 @@ C:/> npm run start-client
 Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser. The backend is running in [http://localhost:5000](http://localhost:3000). 
 
 ### Running tests:
-The app has tests for the backend. You can all run the tests in the backend directory with the command:
+The app has tests for the backend. You can run all the tests in the backend directory with the command:
 ```
 C:/> Solita-Vaccination-Exercise/backend
 C:/> npm test
