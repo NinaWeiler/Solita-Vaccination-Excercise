@@ -1,5 +1,5 @@
 import React from 'react'
-import './Styles.css'
+import '../styles/Styles.css'
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 
 const Navbar = () => {

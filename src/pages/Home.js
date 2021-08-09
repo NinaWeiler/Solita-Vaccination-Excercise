@@ -8,8 +8,8 @@ import orderService from '../services/orders'
 import { Table, DetailsTable } from '../components/Table'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Tooltip from '@material-ui/core/Tooltip';
-import '../components/Styles.css'
-import '../components/CalendarStyle.css'
+import '../styles/Styles.css'
+import '../styles/CalendarStyle.css'
 
 const initialState = {
     totalGivenBy: [],
