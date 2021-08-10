@@ -1,8 +1,0 @@
-[
-{"id":"7d632407-ec94-4a06-a816-8b2c22428709","orderNumber":4905,"responsiblePerson":"Ansa Rislakki","healthCareDistrict":"HYKS","vaccine":"Zerpfy","injections":5,"arrived":"2021-02-08T16:30:02.703815Z"},
-{"id":"b2ab759f-b809-4999-8843-d45a1ed43eb0","orderNumber":4907,"responsiblePerson":"Päivö Hainari","healthCareDistrict":"HYKS","vaccine":"Zerpfy","injections":5,"arrived":"2021-02-22T23:58:14.703833Z"},
-{"id":"1d5fac25-7798-492e-92df-7d2df6b410cc","orderNumber":4909,"responsiblePerson":"Satu Koskikallio","healthCareDistrict":"HYKS","vaccine":"Zerpfy","injections":5,"arrived":"2021-01-14T11:36:01.703851Z"},
-{"id":"7f736d6f-1e2c-42a2-acbb-84b4065a8515","orderNumber":4911,"responsiblePerson":"Vappu Apajalahti","healthCareDistrict":"TAYS","vaccine":"Zerpfy","injections":5,"arrived":"2021-02-25T03:04:04.703869Z"},
-{"id":"dcbd31a0-bdfa-4bab-8e0e-749391fcda5b","orderNumber":4917,"responsiblePerson":"Taisto Rinkama","healthCareDistrict":"HYKS","vaccine":"Zerpfy","injections":5,"arrived":"2021-03-02T03:31:03.703924Z"},
-{"id":"f7b34f3b-41af-4fc1-b1d4-2a217a79baa2","orderNumber":4918,"responsiblePerson":"Unto Tuura","healthCareDistrict":"KYS","vaccine":"Zerpfy","injections":5,"arrived":"2021-03-15T04:20:08.703933Z"}
-]
