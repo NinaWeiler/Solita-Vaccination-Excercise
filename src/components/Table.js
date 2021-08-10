@@ -1,6 +1,7 @@
 import React from "react";
 import Tooltip from '@material-ui/core/Tooltip';
 import '../styles/Styles.css'
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 
 const TableHeader = ({titles}) => {
     return (
@@ -10,7 +11,7 @@ const TableHeader = ({titles}) => {
                 {titles.map((t, index) => {
                      return (
                          <Tooltip key={index} title={t.tooltip} aria-label={t.tooltip} placement='top' arrow>
-                            <th>{t.title}</th>
+                            <th>{t.title} <InfoOutlinedIcon fontSize='small'/></th>
                         </Tooltip>
                      )
                 })}

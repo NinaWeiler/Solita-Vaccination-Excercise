@@ -8,6 +8,7 @@ import orderService from '../services/orders'
 import { Table, DetailsTable } from '../components/Table'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Tooltip from '@material-ui/core/Tooltip';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import '../styles/Styles.css'
 import '../styles/CalendarStyle.css'
 
@@ -164,7 +165,7 @@ const Home = ({vaccinations, orders, loading}) => {
             <div class="column is-4-desktop is-8-tablet is-centered">
                <div class="box" >
                     <Tooltip placement='top' title='Check status for a date in between 02.01.2021 - 12.04.2021' aria-label='Check status for a date in between 02.01.2021 - 13.04.2021' arrow>
-                        <div><h2 class="has-text-danger-dark is-size-4 has-text-weight-medium has-text-centered">Select a date</h2></div>
+                        <div><h2 class="has-text-danger-dark is-size-4 has-text-weight-medium has-text-centered">Select a date <InfoOutlinedIcon fontSize='small'/></h2></div>
                     </Tooltip>
                 <div className='centerCalendar'>
                     <DatePicker 
