@@ -6,7 +6,7 @@ const Footer = () => {
         <footer class="footer" >
         <div class="content has-text-centered has-text-danger-dark">
             <p>
-            <strong>Vaxxy</strong> by <a href="https://github.com/NinaWeiler">Nina Weiler</a>.
+            <strong>Vaxxy</strong> by <a href="https://github.com/NinaWeiler/Solita-Vaccination-Exercise">Nina Weiler</a>
             </p>
         </div>
         </footer>

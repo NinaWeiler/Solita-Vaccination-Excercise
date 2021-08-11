@@ -13,15 +13,30 @@
     display: flex;
     justify-content: center;
     margin-top: 1rem;
-
 }
 
 .spinnerStyle {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 330px;
+    min-height: 341px;
 
+}
+
+.boxStyle {
+    height: 341px;
+}
+
+.spaceBetween {
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 2rem;
+    max-width: 90%; 
 }
 
 @media screen and (min-width: 600px) and (max-width: 1025px) {
@@ -32,6 +47,7 @@
 } 
 
 /* overriding Bulma and Mui default styles */
+
 
 .container {
     min-height: 68vh;
@@ -64,4 +80,8 @@ a {
 
 .MuiSvgIcon-fontSizeSmall {
     font-size: 1rem !important;
+}
+
+.button {
+    border-style: none;
 }

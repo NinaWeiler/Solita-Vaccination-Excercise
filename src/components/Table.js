@@ -51,7 +51,7 @@ export const Table = ({ state, day }) => {
         <table class="table is-hoverable is-narrow">
         <TableHeader titles={[{title: `On ${day}`, tooltip: 'Selected day'}, {title: 'In total', tooltip:'Status by selected day'}]} />
             <tbody>
-                <TableRow title='Orders arrived (bottle)' values={[state.arrivedToday.length]}
+                <TableRow title='Orders arrived (bottles)' values={[state.arrivedToday.length]}
                     total={state.totalArrivedBy.length} />
                 <TableRow title='Vaccinations given' values={[state.givenToday.length]}
                     total={state.totalGivenBy.length} />
@@ -69,11 +69,11 @@ export const Table = ({ state, day }) => {
 export const DetailsTable = ({ state, brandDetails, InjectionsArrivedToday, InjectionsArrived, day }) => {
     return (
         <div className='tableStyle'>
-        <table class='table is-hoverable is-narrow is-flex-shrink-3'>
+        <table class='table is-hoverable is-narrow is-flex-shrink-5'>
             <TableHeader titles={[{title: 'Zerpfy', tooltip:'5 injections per bottle'},
             {title: 'Antiqua', tooltip:'4 injections per bottle'}, 
             {title: 'SolarBuddhica', tooltip:'6 injections per bottle'},
-            {title: 'Total', tooltip: 'In total' }]} />
+            {title: 'Total', tooltip: 'Status by selected day' }]} />
                 <tbody>
                     <SubHeader title={`Status on ${day}`}/>
                     <TableRow title='Orders arrived' values={[brandDetails.zerpfyArrived.todaysOrders, brandDetails.antiquaArrived.todaysOrders, brandDetails.solarBuddhicaArrived.todaysOrders]} 
@@ -82,7 +82,7 @@ export const DetailsTable = ({ state, brandDetails, InjectionsArrivedToday, Inje
                         total={InjectionsArrivedToday} />
                     <TableRow title='Vaccinations expired' values={[brandDetails.zerpfyExpired, brandDetails.antiquaExpired, brandDetails.solarBuddhicaExpired]}
                         total={brandDetails.totalExpiredToday} />
-                    <SubHeader title='Total status per producer' />
+                    <SubHeader title='Total per manufacturer' />
                     <TableRow title='Orders arrived' values={[brandDetails.zerpfyArrived.totalOrders, brandDetails.antiquaArrived.totalOrders, brandDetails.solarBuddhicaArrived.totalOrders]}
                         total={state.totalArrivedBy.length} />
                     <TableRow title='Vaccinations arrived' values={[brandDetails.zerpfyArrived.totalInjections, brandDetails.antiquaArrived.totalInjections, brandDetails.solarBuddhicaArrived.totalInjections]}
