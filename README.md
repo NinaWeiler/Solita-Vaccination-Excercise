@@ -50,7 +50,7 @@ C:/> Solita-Vaccination-Exercise
 
 C:/> npm start
 ```
-Now you can open [http://localhost:5000](http://localhost:5000) to view it in the browser. The API endpoints can be accessed in http://localhost:500/api + endpoint. 
+Now you can open [http://localhost:5000](http://localhost:5000) to view it in the browser. The API endpoints can be accessed in http://localhost:5000/api + endpoint. 
 
 ### Running frontend and backend in development mode
 * Navigate to the backend folder and run project in development mode with the command:
@@ -63,7 +63,7 @@ C:/> npm run dev
 C:/> cd Solita-Vaccination-Exercise
 C:/> npm run start-client
 ```
-Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser. The backend is running in [http://localhost:5000](http://localhost:3000). 
+Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser. The backend is running in [http://localhost:5000](http://localhost:5000/api). 
 
 ### Running tests:
 The app has tests for the backend. You can run all the tests in the backend directory with the command:
